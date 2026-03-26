@@ -771,78 +771,26 @@
 /* -------------------------------------------------------------------
    8. UPLOAD AREA
    ------------------------------------------------------------------- */
+
+/* Full upload region — flex column with sticky action bar at bottom */
 .fp-upload-area {
     flex: 1;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
+    overflow: hidden;
 }
 
-.fp-dropzone {
-    width: 100%;
-    max-width: 560px;
-    padding: 60px 40px;
-    border: 2px dashed var(--fp-gray-300);
-    border-radius: var(--fp-radius-xl);
-    text-align: center;
-    cursor: pointer;
-    transition: all var(--fp-duration) var(--fp-ease);
-    background: var(--fp-gray-50);
-}
-
-.fp-dropzone:hover {
-    border-color: var(--fp-primary);
-    background: var(--fp-primary-soft);
-}
-
-.fp-dropzone-active {
-    border-color: var(--fp-primary);
-    background: var(--fp-primary-soft);
-    transform: scale(1.01);
-}
-
-.fp-dropzone-icon {
-    width: 48px;
-    height: 48px;
-    margin: 0 auto 16px;
-    color: var(--fp-gray-400);
-    transition: color var(--fp-duration) var(--fp-ease);
-}
-
-.fp-dropzone:hover .fp-dropzone-icon {
-    color: var(--fp-primary);
-}
-
-.fp-dropzone-text {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--fp-gray-700);
-    margin-bottom: 4px;
-}
-
-.fp-dropzone-hint {
-    font-size: 13px;
-    color: var(--fp-gray-400);
-}
-
-.fp-file-input {
-    display: none;
-}
-
-/* Upload Progress */
-.fp-upload-progress {
-    width: 100%;
-    max-width: 560px;
-    margin-top: 24px;
+/* ── Toast message (top, non-scrolling) ─────────────────────────── */
+.fp-upload-toast {
+    flex-shrink: 0;
+    padding: 12px 24px 0;
 }
 
 .fp-upload-message {
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 12px 16px;
+    padding: 10px 14px;
     border-radius: var(--fp-radius);
     font-size: 13px;
     font-weight: 500;
@@ -850,15 +798,8 @@
 }
 
 @keyframes fp-slide-down {
-    from {
-        opacity: 0;
-        transform: translateY(-4px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-4px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .fp-upload-message-success {
@@ -885,34 +826,194 @@
     flex-shrink: 0;
 }
 
-/* Pending Files — Grid with Thumbnails */
-.fp-pending-files {
-    width: 100%;
-    max-width: 700px;
-    margin-top: 24px;
-    max-height: var(--fp-config-upload-max-height, 400px);
-    overflow-y: auto;
-    padding: 4px;
+.fp-upload-toast-close {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: 50%;
+    color: inherit;
+    opacity: 0.5;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity var(--fp-duration) var(--fp-ease);
 }
 
+.fp-upload-toast-close:hover {
+    opacity: 1;
+}
+
+.fp-upload-toast-close svg {
+    width: 14px;
+    height: 14px;
+}
+
+/* ── Scrollable body ────────────────────────────────────────────── */
+.fp-upload-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.fp-file-input {
+    display: none;
+}
+
+/* ── Hero dropzone (no files selected yet) ──────────────────────── */
+.fp-dropzone {
+    cursor: pointer;
+    transition: all var(--fp-duration) var(--fp-ease);
+    user-select: none;
+}
+
+.fp-dropzone-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 280px;
+    padding: 48px 40px;
+    border: 2px dashed var(--fp-gray-300);
+    border-radius: var(--fp-radius-xl);
+    text-align: center;
+    background: var(--fp-gray-50);
+}
+
+.fp-dropzone-hero:hover {
+    border-color: var(--fp-primary);
+    background: var(--fp-primary-soft);
+}
+
+.fp-dropzone-active.fp-dropzone-hero {
+    border-color: var(--fp-primary);
+    background: var(--fp-primary-soft);
+    transform: scale(1.005);
+}
+
+.fp-dropzone-icon-wrap {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border-radius: 50%;
+    box-shadow: var(--fp-shadow-md);
+}
+
+.fp-dropzone-icon {
+    width: 36px;
+    height: 36px;
+    color: var(--fp-primary);
+}
+
+.fp-dropzone-text {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--fp-gray-800);
+    margin-bottom: 4px;
+}
+
+.fp-dropzone-hint {
+    font-size: 13px;
+    color: var(--fp-gray-400);
+    margin-bottom: 16px;
+}
+
+.fp-dropzone-browse-btn {
+    display: inline-block;
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fp-primary);
+    background: white;
+    border: 1.5px solid color-mix(in srgb, var(--fp-primary) 35%, transparent);
+    border-radius: var(--fp-radius);
+    transition: all var(--fp-duration) var(--fp-ease);
+}
+
+.fp-dropzone-hero:hover .fp-dropzone-browse-btn {
+    background: var(--fp-primary);
+    color: white;
+    border-color: var(--fp-primary);
+}
+
+/* ── Compact dropzone (files already queued) ────────────────────── */
+.fp-dropzone-compact {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 14px 20px;
+    border: 2px dashed var(--fp-gray-200);
+    border-radius: var(--fp-radius);
+    background: var(--fp-gray-50);
+    flex-shrink: 0;
+}
+
+.fp-dropzone-compact:hover {
+    border-color: var(--fp-primary);
+    background: var(--fp-primary-soft);
+}
+
+.fp-dropzone-active.fp-dropzone-compact {
+    border-color: var(--fp-primary);
+    background: var(--fp-primary-soft);
+}
+
+.fp-dropzone-compact-icon {
+    width: 18px;
+    height: 18px;
+    color: var(--fp-gray-400);
+    transition: color var(--fp-duration) var(--fp-ease);
+}
+
+.fp-dropzone-compact:hover .fp-dropzone-compact-icon {
+    color: var(--fp-primary);
+}
+
+.fp-dropzone-compact-text {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fp-gray-500);
+    transition: color var(--fp-duration) var(--fp-ease);
+}
+
+.fp-dropzone-compact:hover .fp-dropzone-compact-text {
+    color: var(--fp-primary);
+}
+
+/* ── Pending file grid ──────────────────────────────────────────── */
 .fp-pending-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--fp-config-upload-grid-min-width, 120px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(var(--fp-config-upload-grid-min-width, 130px), 1fr));
     gap: 12px;
 }
 
 .fp-pending-card {
     position: relative;
     background: white;
-    border: 1px solid var(--fp-border);
+    border: 1px solid var(--fp-gray-200);
     border-radius: var(--fp-radius);
     overflow: hidden;
     animation: fp-slide-down 0.15s var(--fp-ease);
-    transition: box-shadow var(--fp-duration) var(--fp-ease);
+    transition: box-shadow var(--fp-duration) var(--fp-ease),
+        border-color var(--fp-duration) var(--fp-ease);
 }
 
 .fp-pending-card:hover {
     box-shadow: var(--fp-shadow-md);
+    border-color: var(--fp-gray-300);
 }
 
 .fp-pending-thumb {
@@ -968,20 +1069,20 @@
 .fp-pending-size {
     color: var(--fp-gray-400);
     font-size: 11px;
-    margin-top: 1px;
+    margin-top: 2px;
 }
 
 .fp-pending-remove {
     position: absolute;
-    top: 4px;
-    right: 4px;
+    top: 5px;
+    right: 5px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
     padding: 0;
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.95);
     border: none;
     border-radius: 50%;
     color: var(--fp-gray-400);
@@ -998,19 +1099,108 @@
 .fp-pending-remove:hover {
     background: #fef2f2;
     color: var(--fp-danger);
+    transform: scale(1.1);
 }
 
 .fp-pending-remove svg {
-    width: 12px;
-    height: 12px;
+    width: 13px;
+    height: 13px;
 }
 
-/* Upload Actions */
-.fp-upload-actions {
+/* ── Sticky action bar at bottom ────────────────────────────────── */
+.fp-upload-action-bar {
+    flex-shrink: 0;
     display: flex;
-    justify-content: center;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: white;
+    border-top: 1px solid var(--fp-border);
+    box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.fp-upload-action-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.fp-upload-action-count {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fp-gray-700);
+}
+
+.fp-upload-action-count svg {
+    width: 16px;
+    height: 16px;
+    color: var(--fp-gray-400);
+}
+
+.fp-upload-action-size {
+    font-size: 12px;
+    color: var(--fp-gray-400);
+    padding-left: 12px;
+    border-left: 1px solid var(--fp-gray-200);
+}
+
+.fp-upload-action-buttons {
+    display: flex;
+    align-items: center;
     gap: 8px;
-    margin-top: 16px;
+}
+
+.fp-upload-action-clear {
+    padding: 7px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--fp-gray-600);
+    background: none;
+    border: 1px solid var(--fp-gray-200);
+    border-radius: var(--fp-radius-sm);
+    cursor: pointer;
+    transition: all var(--fp-duration) var(--fp-ease);
+}
+
+.fp-upload-action-clear:hover {
+    background: var(--fp-gray-50);
+    border-color: var(--fp-gray-300);
+    color: var(--fp-danger);
+}
+
+.fp-upload-action-submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: inherit;
+    color: white;
+    background: var(--fp-primary);
+    border: none;
+    border-radius: var(--fp-radius-sm);
+    cursor: pointer;
+    transition: all var(--fp-duration) var(--fp-ease);
+}
+
+.fp-upload-action-submit:hover:not(:disabled) {
+    background: var(--fp-primary-hover);
+    box-shadow: var(--fp-shadow-sm);
+}
+
+.fp-upload-action-submit:disabled {
+    opacity: 0.65;
+    cursor: not-allowed;
+}
+
+.fp-upload-action-submit svg {
+    width: 16px;
+    height: 16px;
 }
 
 /* -------------------------------------------------------------------
@@ -1849,6 +2039,46 @@
         gap: 10px;
     }
 
+    .fp-upload-body {
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .fp-dropzone-hero {
+        min-height: 200px;
+        padding: 32px 24px;
+    }
+
+    .fp-dropzone-icon-wrap {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 12px;
+    }
+
+    .fp-dropzone-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .fp-dropzone-text {
+        font-size: 15px;
+    }
+
+    .fp-upload-action-bar {
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .fp-upload-action-size {
+        display: none;
+    }
+
+    .fp-pending-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 8px;
+    }
+
     .fp-footer {
         flex-direction: column;
         gap: 12px;
@@ -1883,6 +2113,45 @@
         display: none;
     }
 
+    .fp-dropzone-hero {
+        min-height: 160px;
+        padding: 24px 16px;
+    }
+
+    .fp-dropzone-hint {
+        display: none;
+    }
+
+    .fp-upload-action-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .fp-upload-action-info {
+        justify-content: center;
+    }
+
+    .fp-upload-action-buttons {
+        justify-content: center;
+    }
+
+    .fp-pending-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 6px;
+    }
+
+    .fp-pending-card-info {
+        padding: 6px 8px;
+    }
+
+    .fp-pending-name {
+        font-size: 11px;
+    }
+
+    .fp-pending-remove {
+        opacity: 1;
+    }
+
     .fp-toolbar-actions {
         flex-wrap: wrap;
     }
@@ -1914,6 +2183,11 @@
     .fp-search-clear,
     .fp-selection-action-btn,
     .fp-dropzone,
+    .fp-dropzone-browse-btn,
+    .fp-upload-action-submit,
+    .fp-upload-action-clear,
+    .fp-pending-card,
+    .fp-pending-remove,
     .fp-item,
     .fp-thumbnail img,
     .fp-video-overlay,
@@ -1922,8 +2196,7 @@
     .fp-btn,
     .fp-preview-remove,
     .fp-alt-display,
-    .fp-upload-message,
-    .fp-pending-file {
+    .fp-upload-message {
         transition: none !important;
         animation: none !important;
     }

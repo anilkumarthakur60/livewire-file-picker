@@ -234,38 +234,21 @@
                              UPLOAD TAB
                              ======================================================== --}}
                         @if ($currentTab === 'upload' && config('file-picker.features.upload', true))
-                            <div class="fp-upload-area" id="fp-upload-area">
-                                {{-- Dropzone --}}
-                                <div class="fp-dropzone" x-data="{
-                                    isDragging: false,
-                                    handleDrop(e) {
-                                        this.isDragging = false;
-                                        const files = e.dataTransfer.files;
-                                        const fileInput = document.getElementById('fp-file-input-{{ $inputId }}');
-                                        if (fileInput && files.length > 0) {
-                                            fileInput.files = files;
-                                            fileInput.dispatchEvent(new Event('change', { bubbles: true }));
-                                        }
+                            <div class="fp-upload-area" id="fp-upload-area" x-data="{
+                                isDragging: false,
+                                handleDrop(e) {
+                                    this.isDragging = false;
+                                    const files = e.dataTransfer.files;
+                                    const fileInput = document.getElementById('fp-file-input-{{ $inputId }}');
+                                    if (fileInput && files.length > 0) {
+                                        fileInput.files = files;
+                                        fileInput.dispatchEvent(new Event('change', { bubbles: true }));
                                     }
-                                }" @dragover.prevent="isDragging = true"
-                                     @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop($event)"
-                                     @click="$refs.fileInput.click()" :class="{ 'fp-dropzone-active': isDragging }">
-                                    <svg class="fp-dropzone-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
-                                    </svg>
-                                    <p class="fp-dropzone-text">{{ config('file-picker.texts.drop_zone', 'Drop files here or click to upload') }}</p>
-                                    <p class="fp-dropzone-hint">{{ config('file-picker.texts.drop_zone_hint', 'Supports: Images, Videos, Documents, and more') }}</p>
-                                    <input type="file" wire:model="uploadedFiles" multiple
-                                           id="fp-file-input-{{ $inputId }}"
-                                           x-ref="fileInput"
-                                           accept="{{ $this->getAcceptAttribute() }}"
-                                           class="fp-file-input">
-                                </div>
-
-                                {{-- Upload Message --}}
+                                }
+                            }">
+                                {{-- Upload Message (toast at top) --}}
                                 @if ($uploadMessage)
-                                    <div class="fp-upload-progress">
+                                    <div class="fp-upload-toast">
                                         <div class="fp-upload-message fp-upload-message-{{ $uploadStatus }}">
                                             @if ($uploadStatus === 'success')
                                                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -285,20 +268,75 @@
                                                 </svg>
                                             @endif
                                             <span>{{ $uploadMessage }}</span>
+                                            <button type="button" wire:click="$dispatch('clearUploadMessage')" class="fp-upload-toast-close">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
                                         </div>
                                     </div>
                                 @endif
 
-                                {{-- Pending Files — Grid with Thumbnails --}}
-                                @if (!empty($uploadedFiles))
-                                    <div class="fp-pending-files">
+                                {{-- Scrollable body: dropzone + pending files --}}
+                                <div class="fp-upload-body">
+                                    @if (empty($uploadedFiles))
+                                        {{-- Empty state: large centered dropzone --}}
+                                        <div class="fp-dropzone fp-dropzone-hero"
+                                             @dragover.prevent="isDragging = true"
+                                             @dragleave.prevent="isDragging = false"
+                                             @drop.prevent="handleDrop($event)"
+                                             @click="$refs.fileInput.click()"
+                                             :class="{ 'fp-dropzone-active': isDragging }">
+                                            <div class="fp-dropzone-icon-wrap">
+                                                <svg class="fp-dropzone-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                                          d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                </svg>
+                                            </div>
+                                            <p class="fp-dropzone-text">{{ config('file-picker.texts.drop_zone', 'Drop files here or click to upload') }}</p>
+                                            <p class="fp-dropzone-hint">{{ config('file-picker.texts.drop_zone_hint', 'Supports: Images, Videos, Documents, and more') }}</p>
+                                            <div class="fp-dropzone-browse">
+                                                <span class="fp-dropzone-browse-btn">Browse Files</span>
+                                            </div>
+                                            <input type="file" wire:model="uploadedFiles" multiple
+                                                   id="fp-file-input-{{ $inputId }}"
+                                                   x-ref="fileInput"
+                                                   accept="{{ $this->getAcceptAttribute() }}"
+                                                   class="fp-file-input">
+                                        </div>
+                                    @else
+                                        {{-- Compact dropzone when files are queued --}}
+                                        <div class="fp-dropzone fp-dropzone-compact"
+                                             @dragover.prevent="isDragging = true"
+                                             @dragleave.prevent="isDragging = false"
+                                             @drop.prevent="handleDrop($event)"
+                                             @click="$refs.fileInput.click()"
+                                             :class="{ 'fp-dropzone-active': isDragging }">
+                                            <svg class="fp-dropzone-compact-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M12 4v16m8-8H4"></path>
+                                            </svg>
+                                            <span class="fp-dropzone-compact-text">Add more files</span>
+                                            <input type="file" wire:model="uploadedFiles" multiple
+                                                   id="fp-file-input-{{ $inputId }}"
+                                                   x-ref="fileInput"
+                                                   accept="{{ $this->getAcceptAttribute() }}"
+                                                   class="fp-file-input">
+                                        </div>
+
+                                        {{-- Pending file grid --}}
                                         <div class="fp-pending-grid">
+                                            @php
+                                                $totalSize = 0;
+                                                foreach ($uploadedFiles as $f) { $totalSize += $f->getSize(); }
+                                            @endphp
                                             @foreach ($uploadedFiles as $index => $file)
                                                 @php
                                                     $isImage = str_starts_with($file->getMimeType() ?? '', 'image/');
                                                     $ext = pathinfo($file->getClientOriginalName(), PATHINFO_EXTENSION);
+                                                    $fileSize = $file->getSize();
                                                 @endphp
-                                                <div class="fp-pending-card">
+                                                <div class="fp-pending-card" wire:key="pending-{{ $index }}">
                                                     {{-- Thumbnail --}}
                                                     <div class="fp-pending-thumb">
                                                         @if ($isImage)
@@ -306,8 +344,7 @@
                                                                  alt="{{ $file->getClientOriginalName() }}">
                                                         @else
                                                             <div class="fp-pending-thumb-icon">
-                                                                <svg fill="none" stroke="currentColor"
-                                                                     viewBox="0 0 24 24">
+                                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                                     <path stroke-linecap="round" stroke-linejoin="round"
                                                                           stroke-width="1.5"
                                                                           d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
@@ -318,18 +355,20 @@
                                                     </div>
                                                     {{-- Info --}}
                                                     <div class="fp-pending-card-info">
-                                                        <div class="fp-pending-name"
-                                                             title="{{ $file->getClientOriginalName() }}">
+                                                        <div class="fp-pending-name" title="{{ $file->getClientOriginalName() }}">
                                                             {{ \Illuminate\Support\Str::limit($file->getClientOriginalName(), 18) }}
                                                         </div>
-                                                        <div
-                                                            class="fp-pending-size">{{ number_format($file->getSize() / 1024, 1) }}
-                                                            KB
+                                                        <div class="fp-pending-size">
+                                                            @if ($fileSize >= 1_048_576)
+                                                                {{ number_format($fileSize / 1_048_576, 1) }} MB
+                                                            @else
+                                                                {{ number_format($fileSize / 1024, 1) }} KB
+                                                            @endif
                                                         </div>
                                                     </div>
                                                     {{-- Remove --}}
                                                     <button type="button" wire:click="removePendingFile({{ $index }})"
-                                                            class="fp-pending-remove">
+                                                            class="fp-pending-remove" title="Remove">
                                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                             <path stroke-linecap="round" stroke-linejoin="round"
                                                                   stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -338,20 +377,49 @@
                                                 </div>
                                             @endforeach
                                         </div>
+                                    @endif
+                                </div>
 
-                                        <div class="fp-upload-actions">
-                                            <button type="button" wire:click="uploadFiles"
-                                                    class="fp-btn fp-btn-primary" @disabled($isUploading)>
+                                {{-- Sticky action bar (always visible when files queued) --}}
+                                @if (!empty($uploadedFiles))
+                                    <div class="fp-upload-action-bar">
+                                        <div class="fp-upload-action-info">
+                                            <span class="fp-upload-action-count">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                          d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                                                </svg>
+                                                {{ count($uploadedFiles) }} {{ count($uploadedFiles) === 1 ? 'file' : 'files' }} ready
+                                            </span>
+                                            <span class="fp-upload-action-size">
+                                                @if ($totalSize >= 1_048_576)
+                                                    {{ number_format($totalSize / 1_048_576, 1) }} MB total
+                                                @else
+                                                    {{ number_format($totalSize / 1024, 1) }} KB total
+                                                @endif
+                                            </span>
+                                        </div>
+                                        <div class="fp-upload-action-buttons">
+                                            <button type="button"
+                                                    wire:click="$set('uploadedFiles', [])"
+                                                    class="fp-upload-action-clear">
+                                                Clear All
+                                            </button>
+                                            <button type="button"
+                                                    wire:click="uploadFiles"
+                                                    class="fp-upload-action-submit"
+                                                    @disabled($isUploading)>
                                                 @if ($isUploading)
-                                                    <svg class="fp-spin"
-                                                         style="width:16px;height:16px;display:inline;vertical-align:middle;margin-right:4px"
-                                                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                        <path stroke-linecap="round" stroke-linejoin="round"
-                                                              stroke-width="2"
+                                                    <svg class="fp-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                               d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                                     </svg>
                                                     Uploading...
                                                 @else
+                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                                    </svg>
                                                     {{ config('file-picker.texts.upload_button', 'Upload Files') }}
                                                 @endif
                                             </button>

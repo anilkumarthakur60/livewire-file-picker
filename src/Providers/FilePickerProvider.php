@@ -31,7 +31,7 @@ final class FilePickerProvider extends ServiceProvider
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../../config/file-picker.php',
+            __DIR__.'/../../config/file-picker.php',
             'file-picker'
         );
 
@@ -73,17 +73,17 @@ final class FilePickerProvider extends ServiceProvider
 
     private function registerViews(): void
     {
-        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'file-picker');
+        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'file-picker');
     }
 
     private function registerTranslations(): void
     {
-        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'file-picker');
+        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang', 'file-picker');
     }
 
     private function registerRoutes(): void
     {
-        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+        $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
     }
 
     private function registerMigrations(): void
@@ -92,54 +92,54 @@ final class FilePickerProvider extends ServiceProvider
         $driver = config('file-picker.driver', 'default');
 
         if ($driver === 'default') {
-            $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+            $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         }
     }
 
     private function registerPublishing(): void
     {
-        if (!$this->app->runningInConsole()) {
+        if (! $this->app->runningInConsole()) {
             return;
         }
 
         $this->publishes([
-            __DIR__ . '/../../config/file-picker.php' => config_path('file-picker.php'),
+            __DIR__.'/../../config/file-picker.php' => config_path('file-picker.php'),
         ], 'file-picker-config');
 
         $this->publishes([
-            __DIR__ . '/../../resources/views' => resource_path('views/vendor/file-picker'),
+            __DIR__.'/../../resources/views' => resource_path('views/vendor/file-picker'),
         ], 'file-picker-views');
 
         $this->publishes([
-            __DIR__ . '/../../resources/css' => public_path('vendor/file-picker'),
-            __DIR__ . '/../../resources/js' => public_path('vendor/file-picker'),
+            __DIR__.'/../../resources/css' => public_path('vendor/file-picker'),
+            __DIR__.'/../../resources/js' => public_path('vendor/file-picker'),
         ], 'file-picker-assets');
 
         $this->publishes([
-            __DIR__ . '/../../database/migrations' => database_path('migrations'),
+            __DIR__.'/../../database/migrations' => database_path('migrations'),
         ], 'file-picker-migrations');
 
         $this->publishes([
-            __DIR__ . '/../../resources/lang' => lang_path('vendor/file-picker'),
+            __DIR__.'/../../resources/lang' => lang_path('vendor/file-picker'),
         ], 'file-picker-lang');
 
         $this->publishes([
-            __DIR__ . '/../../config/file-picker.php' => config_path('file-picker.php'),
-            __DIR__ . '/../../resources/views' => resource_path('views/vendor/file-picker'),
-            __DIR__ . '/../../resources/css' => public_path('vendor/file-picker'),
-            __DIR__ . '/../../resources/js' => public_path('vendor/file-picker'),
-            __DIR__ . '/../../resources/lang' => lang_path('vendor/file-picker'),
-            __DIR__ . '/../../database/migrations' => database_path('migrations'),
+            __DIR__.'/../../config/file-picker.php' => config_path('file-picker.php'),
+            __DIR__.'/../../resources/views' => resource_path('views/vendor/file-picker'),
+            __DIR__.'/../../resources/css' => public_path('vendor/file-picker'),
+            __DIR__.'/../../resources/js' => public_path('vendor/file-picker'),
+            __DIR__.'/../../resources/lang' => lang_path('vendor/file-picker'),
+            __DIR__.'/../../database/migrations' => database_path('migrations'),
         ], 'file-picker');
     }
 
     private function resolveCustomDriver(string $driverName, MediaTransformerInterface $transformer): MediaDriverInterface
     {
-        if (!class_exists($driverName)) {
+        if (! class_exists($driverName)) {
             throw DriverNotFoundException::forDriver($driverName);
         }
 
-        if (!is_subclass_of($driverName, MediaDriverInterface::class)) {
+        if (! is_subclass_of($driverName, MediaDriverInterface::class)) {
             throw DriverNotFoundException::forDriver($driverName);
         }
 
