@@ -35,7 +35,7 @@ final class PlankMediaDriver extends AbstractDriver
     {
         parent::__construct($transformer);
 
-        if (! class_exists(self::PLANK_MEDIA_CLASS)) {
+        if (!class_exists(self::PLANK_MEDIA_CLASS)) {
             throw DriverNotFoundException::plankNotInstalled();
         }
 
