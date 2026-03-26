@@ -1,0 +1,74 @@
+{
+    "name": "anil/livewire-file-picker",
+    "description": "A WordPress-like file picker component for Laravel Livewire. Supports images, videos, audio, documents and all file types with a beautiful modal interface.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": [
+        "laravel",
+        "livewire",
+        "file-picker",
+        "media-library",
+        "image-picker",
+        "file-upload",
+        "media-manager"
+    ],
+    "autoload": {
+        "psr-4": {
+            "Anil\\LivewireFilePicker\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Anil\\LivewireFilePicker\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Er. Anil Kumar Thakur",
+            "email": "anilkumarthakur60@gmail.com"
+        }
+    ],
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    },
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": "^8.2|^8.3|^8.4",
+        "illuminate/contracts": "^11.0|^12.0|^13.0",
+        "illuminate/support": "^11.0|^12.0|^13.0",
+        "illuminate/view": "^11.0|^12.0|^13.0",
+        "livewire/livewire": "^3.0|^4.0"
+    },
+    "suggest": {
+        "plank/laravel-mediable": "Required when using the 'plank' driver (^6.0)"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.0",
+        "orchestra/testbench": "^9.0|^10.0|^11.0",
+        "pestphp/pest": "^3.0|^4.0"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-main": "2.x-dev"
+        },
+        "laravel": {
+            "providers": [
+                "Anil\\LivewireFilePicker\\Providers\\FilePickerProvider"
+            ],
+            "aliases": {
+                "FilePicker": "Anil\\LivewireFilePicker\\Facades\\FilePicker"
+            }
+        }
+    },
+    "scripts": {
+        "lint": "pint",
+        "test": "pest",
+        "analyse": "phpstan analyse",
+        "stan": "phpstan analyse"
+    }
+}

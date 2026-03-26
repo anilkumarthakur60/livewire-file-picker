@@ -1,0 +1,46 @@
+# IDE & Editor
+/.idea/
+/.vscode/
+/.fleet/
+/.nova/
+.phpactor.json
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Composer & Dependencies
+/vendor/
+composer.lock
+
+# NPM & Yarn
+/node_modules/
+yarn.lock
+package-lock.json
+
+# Build & Cache
+/build/
+/dist/
+/.cache/
+/.phpstan/
+.phpunit.result.cache
+.phpunit.cache/
+
+# Logs
+*.log
+log/
+logs/
+
+# Testing
+.phpunit.xml
+phpunit.xml
+phpunit.xml.bak
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+.Spotlight-V100
+.Trashes
