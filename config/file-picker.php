@@ -67,7 +67,7 @@ return [
 
     'defaults' => [
         'multiple' => false,
-        'max_files' => 10,
+        'max_files' => 40,
         'per_page' => 24,
         'show_preview' => true,
     ],
