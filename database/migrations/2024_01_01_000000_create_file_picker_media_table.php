@@ -22,8 +22,16 @@ return new class extends Migration
             $table->string('alt')->nullable();
             $table->unsignedInteger('width')->nullable();
             $table->unsignedInteger('height')->nullable();
+            $table->unsignedInteger('duration')->nullable();
+            $table->string('hash', 64)->nullable()->index();
+            $table->string('folder')->nullable()->index();
+            $table->json('tags')->nullable();
+            $table->boolean('is_favorite')->default(false)->index();
+            $table->unsignedBigInteger('user_id')->nullable()->index();
+            $table->unsignedBigInteger('download_count')->default(0);
             $table->json('custom_properties')->nullable();
             $table->timestamps();
+            $table->softDeletes();
 
             $table->index('created_at');
             $table->index('filename');

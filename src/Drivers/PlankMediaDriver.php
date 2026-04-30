@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Anil\LivewireFilePicker\Drivers;
 
 use Anil\LivewireFilePicker\Contracts\MediaTransformerInterface;
+use Anil\LivewireFilePicker\Events\MediaReplaced;
 use Anil\LivewireFilePicker\Events\MediaUploaded;
 use Anil\LivewireFilePicker\Exceptions\DriverNotFoundException;
 use Anil\LivewireFilePicker\Exceptions\UploadFailedException;
@@ -98,6 +99,26 @@ final class PlankMediaDriver extends AbstractDriver
         }
     }
 
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public function replaceFile(int $id, TemporaryUploadedFile $file, array $options = []): Model
+    {
+        $existing = $this->findByIdOrFail($id);
+
+        $oldPath = $this->buildPlankPath($existing);
+
+        $replacement = $this->upload($file, $options);
+
+        $existing->delete();
+
+        $newPath = $this->buildPlankPath($replacement);
+
+        MediaReplaced::dispatch($replacement, $oldPath, $newPath, $this->driverName());
+
+        return $replacement;
+    }
+
     protected function modelClass(): string
     {
         return $this->model;
@@ -106,5 +127,17 @@ final class PlankMediaDriver extends AbstractDriver
     protected function performDelete(Model $media): void
     {
         $media->delete();
+    }
+
+    private function buildPlankPath(Model $media): string
+    {
+        $directory = $media->getAttribute('directory');
+        $filename = $media->getAttribute('filename');
+
+        if (! is_string($directory) || ! is_string($filename)) {
+            return '';
+        }
+
+        return rtrim($directory, '/').'/'.$filename;
     }
 }

@@ -67,6 +67,9 @@ class FilePicker extends Component
 
     public string $currentTab = 'library';
 
+    /** Library view mode: 'library' (active) or 'trash' */
+    public string $viewMode = 'library';
+
     // =====================================================================
     // Upload State
     // =====================================================================
@@ -80,6 +83,11 @@ class FilePicker extends Component
 
     public string $uploadStatus = '';
 
+    /** Replacement file (when replacing an existing media item) */
+    public ?TemporaryUploadedFile $replacementFile = null;
+
+    public ?int $replacingMediaId = null;
+
     // =====================================================================
     // Search, Filter & Sort State
     // =====================================================================
@@ -87,6 +95,12 @@ class FilePicker extends Component
     public string $search = '';
 
     public string $filterType = 'all';
+
+    public string $filterFolder = '';
+
+    public string $filterTag = '';
+
+    public bool $filterFavorites = false;
 
     /** @var array<string, mixed> */
     public array $customFilterValues = [];
@@ -113,6 +127,14 @@ class FilePicker extends Component
     public ?int $renamingMediaId = null;
 
     public string $renamingFilename = '';
+
+    public ?int $taggingMediaId = null;
+
+    public string $newTagInput = '';
+
+    public ?int $movingMediaId = null;
+
+    public string $moveTargetFolder = '';
 
     // =====================================================================
     // Pagination State
@@ -206,6 +228,8 @@ class FilePicker extends Component
             'customFilters' => $customFilters,
             'sortFields' => SortField::cases(),
             'sortDirections' => SortDirection::cases(),
+            'availableFolders' => $this->getAvailableFolders(),
+            'availableTags' => $this->getAvailableTags(),
         ]);
     }
 
@@ -221,6 +245,7 @@ class FilePicker extends Component
 
         $this->showModal = true;
         $this->currentTab = 'library';
+        $this->viewMode = 'library';
         $this->resetPagination();
         $this->resetUploadState();
         $this->loadMediaItems();
@@ -231,11 +256,29 @@ class FilePicker extends Component
         $this->showModal = false;
         $this->resetUploadState();
         $this->cancelEditing();
+        $this->cancelRenaming();
+        $this->cancelTagging();
+        $this->cancelMoving();
     }
 
     public function setTab(string $tab): void
     {
         $this->currentTab = $tab;
+    }
+
+    public function setViewMode(string $mode): void
+    {
+        if (! in_array($mode, ['library', 'trash'], true)) {
+            return;
+        }
+
+        if ($mode === 'trash' && ! (bool) config('file-picker.features.trash', true)) {
+            return;
+        }
+
+        $this->viewMode = $mode;
+        $this->resetPagination();
+        $this->loadMediaItems();
     }
 
     // =====================================================================
@@ -306,6 +349,24 @@ class FilePicker extends Component
         $this->loadMediaItems();
     }
 
+    public function updatedFilterFolder(): void
+    {
+        $this->resetPagination();
+        $this->loadMediaItems();
+    }
+
+    public function updatedFilterTag(): void
+    {
+        $this->resetPagination();
+        $this->loadMediaItems();
+    }
+
+    public function updatedFilterFavorites(): void
+    {
+        $this->resetPagination();
+        $this->loadMediaItems();
+    }
+
     public function updatedCustomFilterValues(): void
     {
         $this->resetPagination();
@@ -324,8 +385,19 @@ class FilePicker extends Component
         $this->loadMediaItems();
     }
 
+    public function clearFilters(): void
+    {
+        $this->search = '';
+        $this->filterType = 'all';
+        $this->filterFolder = '';
+        $this->filterTag = '';
+        $this->filterFavorites = false;
+        $this->resetPagination();
+        $this->loadMediaItems();
+    }
+
     // =====================================================================
-    // Editing
+    // Editing (alt text)
     // =====================================================================
 
     public function startEditing(int $mediaId, ?string $alt = ''): void
@@ -383,7 +455,7 @@ class FilePicker extends Component
     }
 
     // =====================================================================
-    // Delete
+    // Delete / Restore / Force Delete
     // =====================================================================
 
     public function deleteMedia(int $mediaId): void
@@ -404,6 +476,40 @@ class FilePicker extends Component
         $this->dispatch('media-deleted', mediaId: $mediaId);
     }
 
+    public function restoreMedia(int $mediaId): void
+    {
+        if (! $this->authorization()->canRestore($mediaId)) {
+            return;
+        }
+
+        try {
+            $this->driver()->restore($mediaId);
+        } catch (MediaNotFoundException) {
+            return;
+        }
+
+        $this->loadMediaItems();
+        $this->dispatch('media-restored', mediaId: $mediaId);
+    }
+
+    public function forceDeleteMedia(int $mediaId): void
+    {
+        if (! $this->authorization()->canForceDelete($mediaId)) {
+            return;
+        }
+
+        $this->selected = array_values(array_diff($this->selected, [$mediaId]));
+
+        try {
+            $this->driver()->forceDelete($mediaId);
+        } catch (MediaNotFoundException) {
+            return;
+        }
+
+        $this->loadMediaItems();
+        $this->dispatch('media-force-deleted', mediaId: $mediaId);
+    }
+
     /**
      * @param  array<int>  $mediaIds
      */
@@ -415,6 +521,176 @@ class FilePicker extends Component
 
         $this->loadMediaItems();
         $this->dispatch('media-bulk-deleted', count: $deleted);
+    }
+
+    // =====================================================================
+    // Favorites
+    // =====================================================================
+
+    public function toggleFavorite(int $mediaId): void
+    {
+        if (! $this->authorization()->canFavorite($mediaId)) {
+            return;
+        }
+
+        try {
+            $this->driver()->toggleFavorite($mediaId);
+        } catch (MediaNotFoundException) {
+            return;
+        }
+
+        $this->loadMediaItems();
+    }
+
+    // =====================================================================
+    // Tags
+    // =====================================================================
+
+    public function startTagging(int $mediaId): void
+    {
+        $this->taggingMediaId = $mediaId;
+        $this->newTagInput = '';
+    }
+
+    public function cancelTagging(): void
+    {
+        $this->taggingMediaId = null;
+        $this->newTagInput = '';
+    }
+
+    public function addTag(): void
+    {
+        $tag = trim($this->newTagInput);
+
+        if ($this->taggingMediaId === null || $tag === '') {
+            return;
+        }
+
+        if (! $this->authorization()->canTag($this->taggingMediaId)) {
+            return;
+        }
+
+        try {
+            $this->driver()->addTag($this->taggingMediaId, $tag);
+        } catch (MediaNotFoundException) {
+            return;
+        }
+
+        $this->newTagInput = '';
+        $this->loadMediaItems();
+    }
+
+    public function removeTag(int $mediaId, string $tag): void
+    {
+        if (! $this->authorization()->canTag($mediaId)) {
+            return;
+        }
+
+        try {
+            $this->driver()->removeTag($mediaId, $tag);
+        } catch (MediaNotFoundException) {
+            return;
+        }
+
+        $this->loadMediaItems();
+    }
+
+    // =====================================================================
+    // Folders
+    // =====================================================================
+
+    public function startMoving(int $mediaId, ?string $currentFolder = null): void
+    {
+        $this->movingMediaId = $mediaId;
+        $this->moveTargetFolder = $currentFolder ?? '';
+    }
+
+    public function cancelMoving(): void
+    {
+        $this->movingMediaId = null;
+        $this->moveTargetFolder = '';
+    }
+
+    public function saveMove(): void
+    {
+        if ($this->movingMediaId === null) {
+            return;
+        }
+
+        if (! $this->authorization()->canMove($this->movingMediaId)) {
+            return;
+        }
+
+        $folder = trim($this->moveTargetFolder);
+
+        try {
+            $this->driver()->moveToFolder($this->movingMediaId, $folder === '' ? null : $folder);
+        } catch (MediaNotFoundException) {
+            return;
+        }
+
+        $this->cancelMoving();
+        $this->loadMediaItems();
+    }
+
+    /**
+     * @param  array<int>  $mediaIds
+     */
+    public function bulkMoveToFolder(array $mediaIds, ?string $folder): void
+    {
+        $folder = $folder !== null ? trim($folder) : null;
+        $folder = $folder === '' ? null : $folder;
+
+        $this->driver()->bulkMoveToFolder($mediaIds, $folder);
+        $this->loadMediaItems();
+        $this->dispatch('media-bulk-moved');
+    }
+
+    // =====================================================================
+    // Replace File
+    // =====================================================================
+
+    public function startReplacing(int $mediaId): void
+    {
+        if (! $this->authorization()->canReplace($mediaId)) {
+            return;
+        }
+
+        $this->replacingMediaId = $mediaId;
+        $this->replacementFile = null;
+    }
+
+    public function cancelReplacing(): void
+    {
+        $this->replacingMediaId = null;
+        $this->replacementFile = null;
+    }
+
+    public function updatedReplacementFile(): void
+    {
+        if ($this->replacingMediaId === null || $this->replacementFile === null) {
+            return;
+        }
+
+        if (! $this->authorization()->canReplace($this->replacingMediaId)) {
+            $this->cancelReplacing();
+
+            return;
+        }
+
+        try {
+            $this->driver()->replaceFile($this->replacingMediaId, $this->replacementFile);
+
+            $this->uploadMessage = 'File replaced successfully.';
+            $this->uploadStatus = 'success';
+        } catch (\Throwable $e) {
+            $this->uploadMessage = 'Replacement failed: '.$e->getMessage();
+            $this->uploadStatus = 'error';
+        } finally {
+            $this->cancelReplacing();
+            $this->loadMediaItems();
+            $this->dispatch('clearUploadMessage');
+        }
     }
 
     // =====================================================================
@@ -507,6 +783,19 @@ class FilePicker extends Component
             $count === 1 => '1 item selected',
             default => "{$count} items selected",
         };
+    }
+
+    #[Computed]
+    public function bulkDownloadUrl(): string
+    {
+        if ($this->selected === []) {
+            return '';
+        }
+
+        $base = url('/file-picker/download-zip');
+        $query = http_build_query(['ids' => $this->selected]);
+
+        return $base.'?'.$query;
     }
 
     // =====================================================================
@@ -607,5 +896,29 @@ class FilePicker extends Component
         }
 
         return $types;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getAvailableFolders(): array
+    {
+        if (! (bool) config('file-picker.features.folders', true)) {
+            return [];
+        }
+
+        return $this->driver()->getFolders();
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function getAvailableTags(): array
+    {
+        if (! (bool) config('file-picker.features.tags', true)) {
+            return [];
+        }
+
+        return $this->driver()->getAllTags();
     }
 }

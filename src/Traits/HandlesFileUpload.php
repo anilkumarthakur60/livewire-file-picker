@@ -7,6 +7,8 @@ namespace Anil\LivewireFilePicker\Traits;
 use Anil\LivewireFilePicker\Contracts\FilePickerAuthorizationInterface;
 use Anil\LivewireFilePicker\Contracts\MediaDriverInterface;
 use Anil\LivewireFilePicker\Enums\FileType;
+use Anil\LivewireFilePicker\Exceptions\DuplicateMediaException;
+use Anil\LivewireFilePicker\Exceptions\StorageQuotaExceededException;
 use Anil\LivewireFilePicker\Exceptions\UploadFailedException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
@@ -17,6 +19,8 @@ use Livewire\WithFileUploads;
  * @property string $uploadMessage
  * @property string $uploadStatus
  * @property string $currentTab
+ * @property string $uploadFolder
+ * @property string $uploadTags
  * @property array<string> $allowedTypes
  *
  * @method void loadMediaItems()
@@ -28,6 +32,10 @@ use Livewire\WithFileUploads;
 trait HandlesFileUpload
 {
     use WithFileUploads;
+
+    public string $uploadFolder = '';
+
+    public string $uploadTags = '';
 
     public function uploadFiles(): void
     {
@@ -102,16 +110,23 @@ trait HandlesFileUpload
 
         $uploadedCount = 0;
         $failedCount = 0;
+        $duplicateCount = 0;
         /** @var array<string> $failedFiles */
         $failedFiles = [];
 
         try {
             $driver = $this->driver();
+            $options = $this->buildUploadOptions();
 
             foreach ($this->uploadedFiles as $file) {
                 try {
-                    $driver->upload($file);
+                    $driver->upload($file, $options);
                     $uploadedCount++;
+                } catch (DuplicateMediaException) {
+                    $duplicateCount++;
+                } catch (StorageQuotaExceededException $e) {
+                    $failedCount++;
+                    $failedFiles[] = $e->getMessage();
                 } catch (UploadFailedException $e) {
                     $failedCount++;
                     $failedFiles[] = $e->getMessage();
@@ -121,10 +136,10 @@ trait HandlesFileUpload
                 }
             }
 
-            $this->setUploadResultMessage($uploadedCount, $failedCount, $failedFiles);
+            $this->setUploadResultMessage($uploadedCount, $failedCount, $duplicateCount, $failedFiles);
             $this->loadMediaItems();
 
-            if ($uploadedCount > 0) {
+            if ($uploadedCount > 0 || $duplicateCount > 0) {
                 $this->currentTab = 'library';
             }
         } finally {
@@ -154,9 +169,9 @@ trait HandlesFileUpload
     /**
      * @param  array<string>  $failedFiles
      */
-    protected function setUploadResultMessage(int $uploaded, int $failed, array $failedFiles): void
+    protected function setUploadResultMessage(int $uploaded, int $failed, int $duplicates, array $failedFiles): void
     {
-        if ($failed === 0) {
+        if ($failed === 0 && $duplicates === 0) {
             $this->uploadMessage = $uploaded === 1
                 ? 'File uploaded successfully!'
                 : "{$uploaded} files uploaded successfully!";
@@ -165,15 +180,38 @@ trait HandlesFileUpload
             return;
         }
 
-        if ($uploaded === 0) {
+        if ($failed === 0 && $uploaded === 0 && $duplicates > 0) {
+            $this->uploadMessage = $duplicates === 1
+                ? 'A duplicate file was detected and reused.'
+                : "{$duplicates} duplicate files were detected and reused.";
+            $this->uploadStatus = 'success';
+
+            return;
+        }
+
+        if ($uploaded === 0 && $duplicates === 0) {
             $this->uploadMessage = 'Upload failed: '.implode(', ', $failedFiles);
             $this->uploadStatus = 'error';
 
             return;
         }
 
-        $this->uploadMessage = "{$uploaded} files uploaded, {$failed} failed.";
-        $this->uploadStatus = 'warning';
+        $parts = [];
+
+        if ($uploaded > 0) {
+            $parts[] = "{$uploaded} uploaded";
+        }
+
+        if ($duplicates > 0) {
+            $parts[] = "{$duplicates} duplicate".($duplicates === 1 ? '' : 's');
+        }
+
+        if ($failed > 0) {
+            $parts[] = "{$failed} failed";
+        }
+
+        $this->uploadMessage = implode(', ', $parts).'.';
+        $this->uploadStatus = $failed > 0 ? 'warning' : 'success';
     }
 
     /**
@@ -229,5 +267,33 @@ trait HandlesFileUpload
         $this->uploadMessage = '';
         $this->uploadStatus = '';
         $this->isUploading = false;
+        $this->uploadFolder = '';
+        $this->uploadTags = '';
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    protected function buildUploadOptions(): array
+    {
+        $options = [];
+
+        $folder = trim($this->uploadFolder);
+
+        if ($folder !== '') {
+            $options['folder'] = $folder;
+        }
+
+        $tags = trim($this->uploadTags);
+
+        if ($tags !== '') {
+            $parts = array_values(array_filter(array_map('trim', explode(',', $tags))));
+
+            if ($parts !== []) {
+                $options['tags'] = $parts;
+            }
+        }
+
+        return $options;
     }
 }

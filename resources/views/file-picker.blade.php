@@ -29,10 +29,18 @@
                                         {{ config('file-picker.texts.tab_upload', 'Upload Files') }}
                                     </button>
                                 @endif
-                                <button type="button" wire:click="setTab('library')"
-                                        class="fp-tab {{ $currentTab === 'library' ? 'fp-tab-active' : '' }}">
+                                <button type="button"
+                                        wire:click="setTab('library');setViewMode('library')"
+                                        class="fp-tab {{ $currentTab === 'library' && $viewMode === 'library' ? 'fp-tab-active' : '' }}">
                                     {{ config('file-picker.texts.tab_library', 'Media Library') }}
                                 </button>
+                                @if (config('file-picker.features.trash', true))
+                                    <button type="button"
+                                            wire:click="setTab('library');setViewMode('trash')"
+                                            class="fp-tab {{ $currentTab === 'library' && $viewMode === 'trash' ? 'fp-tab-active' : '' }}">
+                                        {{ config('file-picker.texts.tab_trash', 'Trash') }}
+                                    </button>
+                                @endif
                             </div>
                         </div>
                         <button type="button" wire:click="closeModal" class="fp-close">
@@ -106,6 +114,35 @@
 
                                 {{-- Separator --}}
                                 <div class="fp-toolbar-separator"></div>
+
+                                {{-- Folder filter --}}
+                                @if (config('file-picker.features.folders', true) && !empty($availableFolders))
+                                    <select wire:model.live="filterFolder" class="fp-select fp-select-compact" title="{{ config('file-picker.texts.folder_label', 'Folder') }}">
+                                        <option value="">{{ config('file-picker.texts.folder_root', 'All folders') }}</option>
+                                        <option value="__root__">{{ config('file-picker.texts.folder_none', '(no folder)') }}</option>
+                                        @foreach ($availableFolders as $folder)
+                                            <option value="{{ $folder }}">{{ $folder }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+
+                                {{-- Tag filter --}}
+                                @if (config('file-picker.features.tags', true) && !empty($availableTags))
+                                    <select wire:model.live="filterTag" class="fp-select fp-select-compact" title="{{ config('file-picker.texts.tags_label', 'Tags') }}">
+                                        <option value="">All tags</option>
+                                        @foreach ($availableTags as $tag)
+                                            <option value="{{ $tag }}">{{ $tag }}</option>
+                                        @endforeach
+                                    </select>
+                                @endif
+
+                                {{-- Favorites toggle --}}
+                                @if (config('file-picker.features.favorites', true))
+                                    <label class="fp-toolbar-toggle" title="{{ config('file-picker.texts.favorites_only', 'Favorites only') }}">
+                                        <input type="checkbox" wire:model.live="filterFavorites">
+                                        <span>★</span>
+                                    </label>
+                                @endif
 
                                 {{-- Custom Filters --}}
                                 @foreach ($customFilters ?? [] as $cf)
@@ -206,6 +243,18 @@
                                                 </svg>
                                                 {{ config('file-picker.texts.clear_selection', 'Clear') }}
                                             </button>
+                                            @if (config('file-picker.features.bulk_download', true) && $this->bulkDownloadUrl !== '')
+                                                <a href="{{ $this->bulkDownloadUrl }}"
+                                                   class="fp-selection-action-btn"
+                                                   target="_blank">
+                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1M16 12l-4 4m0 0l-4-4m4 4V4"></path>
+                                                    </svg>
+                                                    {{ config('file-picker.texts.download_all_button', 'Download as ZIP') }}
+                                                </a>
+                                            @endif
+
                                             @if (config('file-picker.features.bulk_delete', true) && config('file-picker.features.delete', true))
                                                 <button type="button"
                                                         wire:click="bulkDelete({{ json_encode($selected) }})"
@@ -380,6 +429,26 @@
                                     @endif
                                 </div>
 
+                                {{-- Upload metadata fields (folder + tags) --}}
+                                @if (!empty($uploadedFiles) && (config('file-picker.features.folders', true) || config('file-picker.features.tags', true)))
+                                    <div style="padding:0 16px 12px 16px;display:flex;gap:8px;flex-wrap:wrap;">
+                                        @if (config('file-picker.features.folders', true))
+                                            <input type="text"
+                                                   wire:model="uploadFolder"
+                                                   placeholder="Folder (optional)"
+                                                   class="fp-search-input"
+                                                   style="flex:1;min-width:160px;background-image:none;padding-left:10px">
+                                        @endif
+                                        @if (config('file-picker.features.tags', true))
+                                            <input type="text"
+                                                   wire:model="uploadTags"
+                                                   placeholder="Tags, comma-separated"
+                                                   class="fp-search-input"
+                                                   style="flex:2;min-width:200px;background-image:none;padding-left:10px">
+                                        @endif
+                                    </div>
+                                @endif
+
                                 {{-- Sticky action bar (always visible when files queued) --}}
                                 @if (!empty($uploadedFiles))
                                     <div class="fp-upload-action-bar">
@@ -450,6 +519,16 @@
                                                               stroke-width="3" d="M5 13l4 4L19 7"></path>
                                                     </svg>
                                                 </div>
+
+                                                {{-- Favorite Star --}}
+                                                @if (config('file-picker.features.favorites', true) && $viewMode === 'library')
+                                                    <button type="button"
+                                                            wire:click.stop="toggleFavorite({{ $item['id'] }})"
+                                                            title="{{ ($item['is_favorite'] ?? false) ? 'Unfavorite' : 'Favorite' }}"
+                                                            style="position:absolute;top:6px;left:6px;width:24px;height:24px;border:0;background:rgba(0,0,0,0.4);border-radius:50%;color:{{ ($item['is_favorite'] ?? false) ? '#fbbf24' : '#fff' }};cursor:pointer;font-size:14px;line-height:1;z-index:2;">
+                                                        {{ ($item['is_favorite'] ?? false) ? '★' : '☆' }}
+                                                    </button>
+                                                @endif
 
                                                 {{-- Thumbnail / File Icon --}}
                                                 <div class="fp-thumbnail">
@@ -633,14 +712,114 @@
                                             </div>
                                         @endif
 
-                                        {{-- Delete --}}
-                                        @if (config('file-picker.features.delete', true))
+                                        {{-- Tags --}}
+                                        @if (config('file-picker.features.tags', true))
+                                            <div class="fp-input-group">
+                                                <label>{{ config('file-picker.texts.tags_label', 'Tags') }}</label>
+                                                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+                                                    @foreach (($active['tags'] ?? []) as $tag)
+                                                        <span style="display:inline-flex;align-items:center;gap:4px;padding:2px 8px;background:#eef2ff;border-radius:12px;font-size:12px;">
+                                                            {{ $tag }}
+                                                            <button type="button"
+                                                                    wire:click="removeTag({{ $active['id'] }}, '{{ addslashes($tag) }}')"
+                                                                    style="border:0;background:transparent;cursor:pointer;color:#666;">×</button>
+                                                        </span>
+                                                    @endforeach
+                                                </div>
+                                                @if ($taggingMediaId === $active['id'])
+                                                    <input type="text"
+                                                           wire:model="newTagInput"
+                                                           wire:keydown.enter="addTag"
+                                                           wire:keydown.escape="cancelTagging"
+                                                           placeholder="{{ config('file-picker.texts.tags_placeholder', 'Add tag and press Enter') }}"
+                                                           class="fp-search-input"
+                                                           style="width:100%;background-image:none;padding-left:10px">
+                                                @else
+                                                    <button type="button"
+                                                            wire:click="startTagging({{ $active['id'] }})"
+                                                            class="fp-btn-link">+ Add tag</button>
+                                                @endif
+                                            </div>
+                                        @endif
+
+                                        {{-- Folder --}}
+                                        @if (config('file-picker.features.folders', true))
+                                            <div class="fp-input-group">
+                                                <label>{{ config('file-picker.texts.folder_label', 'Folder') }}</label>
+                                                @if ($movingMediaId === $active['id'])
+                                                    <input type="text"
+                                                           wire:model="moveTargetFolder"
+                                                           wire:keydown.enter="saveMove"
+                                                           wire:keydown.escape="cancelMoving"
+                                                           placeholder="(root)"
+                                                           class="fp-search-input"
+                                                           style="width:100%;background-image:none;padding-left:10px">
+                                                @else
+                                                    <div class="fp-alt-display"
+                                                         wire:click="startMoving({{ $active['id'] }}, '{{ addslashes($active['folder'] ?? '') }}')">
+                                                        {{ $active['folder'] ?: '(root)' }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+
+                                        {{-- Sidebar action buttons --}}
+                                        <div class="fp-sidebar-actions" style="display:flex;flex-wrap:wrap;gap:8px;">
+                                            @if (config('file-picker.features.favorites', true))
+                                                <button type="button"
+                                                        wire:click="toggleFavorite({{ $active['id'] }})"
+                                                        class="fp-btn-link"
+                                                        style="color:{{ ($active['is_favorite'] ?? false) ? '#f59e0b' : '#666' }};">
+                                                    {{ ($active['is_favorite'] ?? false) ? '★ '.config('file-picker.texts.unfavorite_button', 'Remove from favorites') : '☆ '.config('file-picker.texts.favorite_button', 'Favorite') }}
+                                                </button>
+                                            @endif
+
+                                            @if (config('file-picker.features.download', true) && !empty($active['download_url']))
+                                                <a href="{{ $active['download_url'] }}" class="fp-btn-link" target="_blank">
+                                                    ⬇ {{ config('file-picker.texts.download_button', 'Download') }}
+                                                </a>
+                                            @endif
+
+                                            @if (config('file-picker.features.replace', true) && $viewMode === 'library')
+                                                @if ($replacingMediaId === $active['id'])
+                                                    <label class="fp-btn-link">
+                                                        Choose file…
+                                                        <input type="file" wire:model="replacementFile" style="display:none">
+                                                    </label>
+                                                    <button type="button" wire:click="cancelReplacing" class="fp-btn-link">Cancel</button>
+                                                @else
+                                                    <button type="button"
+                                                            wire:click="startReplacing({{ $active['id'] }})"
+                                                            class="fp-btn-link">
+                                                        ⤴ {{ config('file-picker.texts.replace_button', 'Replace File') }}
+                                                    </button>
+                                                @endif
+                                            @endif
+                                        </div>
+
+                                        {{-- Delete / Restore / Force Delete --}}
+                                        @if ($viewMode === 'trash')
+                                            <div class="fp-sidebar-actions" style="display:flex;gap:8px;">
+                                                <button type="button"
+                                                        wire:click="restoreMedia({{ $active['id'] }})"
+                                                        wire:confirm="{{ config('file-picker.texts.restore_confirm', 'Restore this file from trash?') }}"
+                                                        class="fp-btn-link">
+                                                    ↩ {{ config('file-picker.texts.restore_button', 'Restore') }}
+                                                </button>
+                                                <button type="button"
+                                                        wire:click="forceDeleteMedia({{ $active['id'] }})"
+                                                        wire:confirm="{{ config('file-picker.texts.force_delete_confirm', 'Permanently delete this file? This cannot be undone.') }}"
+                                                        class="fp-btn-link fp-text-danger">
+                                                    {{ config('file-picker.texts.force_delete_button', 'Delete forever') }}
+                                                </button>
+                                            </div>
+                                        @elseif (config('file-picker.features.delete', true))
                                             <div class="fp-sidebar-actions">
                                                 <button type="button"
                                                         wire:click="deleteMedia({{ $active['id'] }})"
                                                         wire:confirm="{{ config('file-picker.texts.delete_confirm', 'Are you sure you want to delete this file?') }}"
                                                         class="fp-btn-link fp-text-danger">
-                                                    {{ config('file-picker.texts.delete_button', 'Delete permanently') }}
+                                                    {{ config('file-picker.texts.delete_button', 'Move to Trash') }}
                                                 </button>
                                             </div>
                                         @endif

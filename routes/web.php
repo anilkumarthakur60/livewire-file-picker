@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Anil\LivewireFilePicker\Http\Controllers\MediaDownloadController;
 use Illuminate\Support\Facades\Route;
 
 /** @var array<string> $middleware */
@@ -45,4 +46,11 @@ Route::middleware($middleware)->group(function (): void {
             'Cache-Control' => 'public, max-age=31536000',
         ]);
     })->where('file', '[a-zA-Z0-9._-]+\.(css|js)');
+
+    Route::get('/file-picker/download/{id}', [MediaDownloadController::class, 'download'])
+        ->whereNumber('id')
+        ->name('file-picker.download');
+
+    Route::get('/file-picker/download-zip', [MediaDownloadController::class, 'downloadZip'])
+        ->name('file-picker.download-zip');
 });

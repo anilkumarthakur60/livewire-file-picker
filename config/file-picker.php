@@ -183,22 +183,6 @@ return [
         // The array defines the UI controls, but the actual query logic
         // is delegated to the class specified in 'custom_filter_class'.
         // Supported types: 'select', 'text', 'checkbox', 'date_range'
-        //
-        // Example UI setup:
-        // 'custom_filters' => [
-        //     [
-        //         'name'        => 'tag',
-        //         'label'       => 'Tag',
-        //         'type'        => 'select',
-        //         'placeholder' => 'All Tags',
-        //         'options'     => ['' => 'All Tags', 'nature' => 'Nature', 'urban' => 'Urban'],
-        //     ],
-        //     [
-        //         'name'        => 'featured',
-        //         'label'       => 'Featured Only',
-        //         'type'        => 'checkbox',
-        //     ],
-        // ],
         'custom_filters' => [],
 
         // The class responsible for handling the custom filter data and applying it to the builder.
@@ -219,6 +203,7 @@ return [
         'bulk_delete' => true,
         'edit_alt' => true,
         'rename' => true,
+        'replace' => true,
         'search' => true,
         'filter' => true,
         'sorting' => true,
@@ -226,6 +211,85 @@ return [
         'refresh' => true,
         'keyboard_navigation' => true,
         'paste_upload' => true,
+        'favorites' => true,
+        'tags' => true,
+        'folders' => true,
+        'trash' => true,
+        'download' => true,
+        'bulk_download' => true,
+        'stats' => true,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Duplicate Detection
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, files are hashed (SHA-256) on upload. If an identical file
+    | already exists, the strategy decides what to do.
+    |
+    | Strategies:
+    |   'reuse'  — Return the existing media record (no new upload).
+    |   'reject' — Throw a DuplicateMediaException.
+    |   'allow'  — Create a new record anyway (no deduplication).
+    |
+    */
+
+    'duplicate_detection' => [
+        'enabled' => true,
+        'strategy' => env('FILE_PICKER_DUPLICATE_STRATEGY', 'reuse'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Trash / Soft Delete
+    |--------------------------------------------------------------------------
+    |
+    | When enabled, deleted media is soft-deleted (moved to trash) instead of
+    | permanently removed. Files on disk are retained until force-deleted or
+    | pruned via the `file-picker:prune-trash` console command.
+    |
+    | 'retention_days' — How many days trashed items are kept before being
+    |                    eligible for the prune command. Set 0 to disable
+    |                    automatic pruning.
+    |
+    */
+
+    'trash' => [
+        'enabled' => true,
+        'retention_days' => 30,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Ownership
+    |--------------------------------------------------------------------------
+    |
+    | When auto_assign is true, the authenticated user's ID is recorded on
+    | upload via the user_id column. Combine with a custom authorization
+    | class to scope library views per-user.
+    |
+    */
+
+    'ownership' => [
+        'auto_assign' => true,
+        'scope_to_owner' => false,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Storage Quota
+    |--------------------------------------------------------------------------
+    |
+    | Cap total storage usage in BYTES. 0 disables the cap.
+    |   'global'   — across all media records.
+    |   'per_user' — per authenticated user (requires user_id).
+    |
+    */
+
+    'storage_quota' => [
+        'global' => env('FILE_PICKER_QUOTA_GLOBAL', 0),
+        'per_user' => env('FILE_PICKER_QUOTA_PER_USER', 0),
     ],
 
     /*
@@ -238,6 +302,7 @@ return [
         'modal_title' => 'Media Library',
         'tab_upload' => 'Upload Files',
         'tab_library' => 'Media Library',
+        'tab_trash' => 'Trash',
         'drop_zone' => 'Drop files here or click to upload',
         'drop_zone_hint' => 'Supports: Images, Videos, Documents, and more',
         'search_placeholder' => 'Search media...',
@@ -245,19 +310,25 @@ return [
         'sort_label' => 'Sort by:',
         'no_items' => 'No media found',
         'no_items_hint' => 'Upload some files to get started',
+        'no_trash' => 'Trash is empty',
         'upload_button' => 'Upload Files',
         'cancel_button' => 'Cancel',
         'insert_button' => 'Insert Selected',
         'clear_selection' => 'Clear',
         'refresh_button' => 'Refresh',
-        'delete_confirm' => 'Are you sure you want to delete this file?',
-        'bulk_delete_confirm' => 'Are you sure you want to delete the selected files?',
-        'delete_button' => 'Delete permanently',
-        'bulk_delete_button' => 'Delete selected',
+        'delete_confirm' => 'Are you sure you want to move this file to trash?',
+        'force_delete_confirm' => 'Permanently delete this file? This cannot be undone.',
+        'restore_confirm' => 'Restore this file from trash?',
+        'bulk_delete_confirm' => 'Move the selected files to trash?',
+        'delete_button' => 'Move to Trash',
+        'force_delete_button' => 'Delete forever',
+        'restore_button' => 'Restore',
+        'bulk_delete_button' => 'Move selected to trash',
         'edit_alt_placeholder' => 'Enter alt text...',
         'edit_alt_help' => 'Press Enter to save',
         'rename_placeholder' => 'Enter new filename...',
         'rename_button' => 'Rename',
+        'replace_button' => 'Replace File',
         'sidebar_title' => 'Attachment Details',
         'sidebar_empty' => 'Select a file to view details',
         'url_label' => 'File URL',
@@ -265,6 +336,18 @@ return [
         'alt_placeholder' => 'Click to add alt text...',
         'preview_title' => 'Selected',
         'remove_all' => 'Remove All',
+        'favorite_button' => 'Favorite',
+        'unfavorite_button' => 'Remove from favorites',
+        'favorites_only' => 'Favorites only',
+        'tags_label' => 'Tags',
+        'tags_placeholder' => 'Add tag and press Enter',
+        'folder_label' => 'Folder',
+        'folder_root' => 'All folders',
+        'folder_none' => '(no folder)',
+        'move_to_folder' => 'Move to folder...',
+        'download_button' => 'Download',
+        'download_all_button' => 'Download as ZIP',
+        'duplicate_message' => 'A duplicate file was detected and reused.',
     ],
 
     /*

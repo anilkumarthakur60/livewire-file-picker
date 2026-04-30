@@ -33,4 +33,39 @@ final class DefaultAuthorization implements FilePickerAuthorizationInterface
     {
         return true;
     }
+
+    public function canRestore(int $mediaId): bool
+    {
+        return true;
+    }
+
+    public function canForceDelete(int $mediaId): bool
+    {
+        return true;
+    }
+
+    public function canReplace(int $mediaId): bool
+    {
+        return true;
+    }
+
+    public function canFavorite(int $mediaId): bool
+    {
+        return true;
+    }
+
+    public function canTag(int $mediaId): bool
+    {
+        return true;
+    }
+
+    public function canMove(int $mediaId): bool
+    {
+        return true;
+    }
+
+    public function canDownload(int $mediaId): bool
+    {
+        return true;
+    }
 }

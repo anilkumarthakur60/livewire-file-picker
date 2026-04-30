@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Anil\LivewireFilePicker\Providers;
 
+use Anil\LivewireFilePicker\Console\PruneOrphansCommand;
+use Anil\LivewireFilePicker\Console\PruneTrashCommand;
+use Anil\LivewireFilePicker\Console\StatsCommand;
 use Anil\LivewireFilePicker\Contracts\FilePickerAuthorizationInterface;
 use Anil\LivewireFilePicker\Contracts\MediaDriverInterface;
 use Anil\LivewireFilePicker\Contracts\MediaTransformerInterface;
@@ -26,6 +29,7 @@ final class FilePickerProvider extends ServiceProvider
         $this->registerRoutes();
         $this->registerPublishing();
         $this->registerMigrations();
+        $this->registerCommands();
     }
 
     public function register(): void
@@ -94,6 +98,19 @@ final class FilePickerProvider extends ServiceProvider
         if ($driver === 'default') {
             $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
         }
+    }
+
+    private function registerCommands(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+
+        $this->commands([
+            PruneTrashCommand::class,
+            PruneOrphansCommand::class,
+            StatsCommand::class,
+        ]);
     }
 
     private function registerPublishing(): void

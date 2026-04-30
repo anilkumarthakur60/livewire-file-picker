@@ -6,11 +6,22 @@ A WordPress-like file picker component for Laravel Livewire. Supports images, vi
 
 - 📁 **All File Types** - Images, videos, audio, documents, spreadsheets, presentations, archives, and code files
 - 🎨 **Beautiful UI** - Modern, clean interface inspired by WordPress media library
-- 🔍 **Search & Filter** - Quick search and filter by file type
+- 🔍 **Search & Filter** - Quick search and filter by file type, folder, tag, or favorite
 - 📤 **Drag & Drop Upload** - Easy file uploads with drag and drop support
 - ✅ **Single/Multiple Selection** - Choose one or many files
+- 🗑️ **Trash & Restore** - Soft-delete with a recoverable trash bin
+- 🔁 **Replace File** - Update an existing media record's file in place
+- 🪪 **Hash & Duplicate Detection** - SHA-256 dedup with `reuse`, `reject`, or `allow` strategies
+- ⭐ **Favorites** - Star important items
+- 🏷️ **Tags** - Tag media for richer organization and filtering
+- 📂 **Folders** - Group media into folders with bulk move
+- 👤 **Ownership Tracking** - Auto-record `user_id` and optionally scope library per user
+- 📊 **Storage Quotas** - Global or per-user storage caps
+- 📈 **Statistics API** - Aggregate counts/sizes/by-type via `FilePicker::getStats()`
+- 📥 **Force Download + ZIP Bulk Download** - Per-file or multi-file zip downloads
+- 🛠️ **Console Commands** - `prune-trash`, `prune-orphans`, `stats`
 - 📱 **Responsive** - Works great on all devices
-- ⚙️ **Highly Configurable** - Extensive configuration options
+- ⚙️ **Highly Configurable** - Extensive configuration options + feature toggles
 - 🎯 **Form Integration** - Works with Livewire and traditional forms
 - ♿ **Accessible** - Proper keyboard navigation and screen reader support
 
@@ -309,16 +320,58 @@ Views will be published to `resources/views/vendor/file-picker/`.
 
 ### FilePicker Component Methods
 
-| Method                 | Description                       |
-| ---------------------- | --------------------------------- |
-| `openModal()`          | Opens the file picker modal       |
-| `closeModal()`         | Closes the modal                  |
-| `toggleSelection($id)` | Toggle selection of a media item  |
-| `clearSelection()`     | Clear all selected items          |
-| `insertSelected()`     | Confirm selection and close modal |
-| `uploadFiles()`        | Upload pending files              |
-| `deleteMedia($id)`     | Delete a media item               |
-| `refreshMedia()`       | Reload media items                |
+| Method                          | Description                                         |
+| ------------------------------- | --------------------------------------------------- |
+| `openModal()` / `closeModal()`  | Open / close the modal                              |
+| `setViewMode('library'\|'trash')` | Switch between active library and trash             |
+| `toggleSelection($id)`          | Toggle selection of a media item                    |
+| `clearSelection()`              | Clear all selected items                            |
+| `insertSelected()`              | Confirm selection and close modal                   |
+| `uploadFiles()`                 | Upload pending files                                |
+| `deleteMedia($id)`              | Soft-delete a media item (move to trash)            |
+| `restoreMedia($id)`             | Restore from trash                                  |
+| `forceDeleteMedia($id)`         | Permanently delete (and remove file from disk)      |
+| `bulkDelete($ids)`              | Soft-delete many at once                            |
+| `toggleFavorite($id)`           | Toggle favorite                                     |
+| `addTag()` / `removeTag($id, $tag)` | Manage tags on a media item                     |
+| `startMoving($id)` + `saveMove()` | Move a media item to a folder                     |
+| `bulkMoveToFolder($ids, $folder)` | Move many at once                                 |
+| `startReplacing($id)`           | Replace the underlying file (next upload swaps it)  |
+| `refreshMedia()`                | Reload media items                                  |
+| `clearFilters()`                | Reset search/type/folder/tag/favorite filters       |
+
+### FilePicker Facade
+
+Outside the component, drive the library directly:
+
+```php
+use Anil\LivewireFilePicker\Facades\FilePicker;
+
+FilePicker::upload($temporaryFile, ['folder' => 'reports', 'tags' => ['q1', 'finance']]);
+FilePicker::replaceFile($id, $newFile);
+FilePicker::toggleFavorite($id);
+FilePicker::addTag($id, 'archive-2024');
+FilePicker::moveToFolder($id, 'archive/2024');
+FilePicker::restore($id);
+FilePicker::forceDelete($id);
+FilePicker::getStats();          // counts, sizes, by_type, favorites_count, trashed_count
+FilePicker::findByHash($sha256); // dedup lookups
+```
+
+### Console Commands
+
+```bash
+php artisan file-picker:prune-trash --days=30 --dry-run
+php artisan file-picker:prune-orphans --dry-run
+php artisan file-picker:stats
+```
+
+### Download Routes
+
+| Route                                  | Purpose                              |
+| -------------------------------------- | ------------------------------------ |
+| `GET /file-picker/download/{id}`       | Force-download a single file         |
+| `GET /file-picker/download-zip?ids[]=` | Stream a zip of selected media       |
 
 ### Computed Properties
 

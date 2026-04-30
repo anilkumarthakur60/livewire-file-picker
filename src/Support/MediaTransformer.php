@@ -22,6 +22,8 @@ final class MediaTransformer implements MediaTransformerInterface
 
         /** @var Carbon|null $createdAt */
         $createdAt = $media->getAttribute('created_at');
+        /** @var Carbon|null $deletedAt */
+        $deletedAt = $media->getAttribute('deleted_at');
 
         $width = ModelAttributeHelper::nullableInt($media, 'width');
         $height = ModelAttributeHelper::nullableInt($media, 'height');
@@ -31,6 +33,7 @@ final class MediaTransformer implements MediaTransformerInterface
             'filename' => ModelAttributeHelper::string($media, 'filename'),
             'url' => $url,
             'thumbnail_url' => $fileType === FileType::IMAGE ? $url : null,
+            'download_url' => $this->buildDownloadUrl($media),
             'size' => $size,
             'size_formatted' => $this->formatSize($size),
             'mime_type' => ModelAttributeHelper::string($media, 'mime_type'),
@@ -47,6 +50,17 @@ final class MediaTransformer implements MediaTransformerInterface
             'width' => $width,
             'height' => $height,
             'dimensions' => ($width !== null && $height !== null) ? "{$width} x {$height}" : null,
+            'duration' => ModelAttributeHelper::nullableInt($media, 'duration'),
+            'duration_formatted' => $this->formatDuration(ModelAttributeHelper::nullableInt($media, 'duration')),
+            'hash' => ModelAttributeHelper::nullableString($media, 'hash'),
+            'folder' => ModelAttributeHelper::nullableString($media, 'folder'),
+            'tags' => $this->extractTags($media),
+            'is_favorite' => (bool) $media->getAttribute('is_favorite'),
+            'user_id' => ModelAttributeHelper::nullableInt($media, 'user_id'),
+            'download_count' => ModelAttributeHelper::int($media, 'download_count'),
+            'deleted_at' => $deletedAt,
+            'deleted_at_formatted' => $deletedAt?->format('M j, Y') ?? '',
+            'is_trashed' => $deletedAt !== null,
         ];
     }
 
@@ -65,6 +79,18 @@ final class MediaTransformer implements MediaTransformerInterface
         }
 
         return $bytes.' bytes';
+    }
+
+    private function formatDuration(?int $seconds): ?string
+    {
+        if ($seconds === null || $seconds <= 0) {
+            return null;
+        }
+
+        $minutes = intdiv($seconds, 60);
+        $remainingSeconds = $seconds % 60;
+
+        return sprintf('%d:%02d', $minutes, $remainingSeconds);
     }
 
     private function resolveFileType(Model $media): FileType
@@ -98,5 +124,47 @@ final class MediaTransformer implements MediaTransformerInterface
         $result = $media->getUrl();
 
         return is_string($result) ? $result : '';
+    }
+
+    private function buildDownloadUrl(Model $media): string
+    {
+        $key = $media->getKey();
+
+        if (! is_int($key) && ! is_numeric($key)) {
+            return '';
+        }
+
+        try {
+            return url('/file-picker/download/'.(int) $key);
+        } catch (\Throwable) {
+            return '';
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function extractTags(Model $media): array
+    {
+        $tags = $media->getAttribute('tags');
+
+        if (is_string($tags)) {
+            $decoded = json_decode($tags, true);
+            $tags = is_array($decoded) ? $decoded : [];
+        }
+
+        if (! is_array($tags)) {
+            return [];
+        }
+
+        $clean = [];
+
+        foreach ($tags as $tag) {
+            if (is_string($tag) && $tag !== '') {
+                $clean[] = $tag;
+            }
+        }
+
+        return array_values(array_unique($clean));
     }
 }

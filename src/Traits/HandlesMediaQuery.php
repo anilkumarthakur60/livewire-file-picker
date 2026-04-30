@@ -12,12 +12,17 @@ use Anil\LivewireFilePicker\Enums\SortField;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * @property string $search
  * @property string $filterType
  * @property string $sortField
  * @property string $sortDirection
+ * @property string $filterFolder
+ * @property string $filterTag
+ * @property bool $filterFavorites
+ * @property string $viewMode
  * @property array<string> $allowedTypes
  * @property array<string, mixed> $customFilterValues
  *
@@ -32,11 +37,17 @@ trait HandlesMediaQuery
      */
     protected function buildMediaQuery(): Builder
     {
-        $query = $this->driver()->query();
+        $query = $this->viewMode === 'trash'
+            ? $this->driver()->queryOnlyTrashed()
+            : $this->driver()->query();
 
         $this->applySearchFilter($query);
         $this->applyTypeFilter($query);
         $this->applyAllowedTypesFilter($query);
+        $this->applyFolderFilter($query);
+        $this->applyTagFilter($query);
+        $this->applyFavoritesFilter($query);
+        $this->applyOwnershipScope($query);
         $this->applyCustomFilters($query);
         $this->applySorting($query);
 
@@ -107,6 +118,72 @@ trait HandlesMediaQuery
         if ($allowedExtensions !== []) {
             $query->whereIn('extension', array_unique($allowedExtensions));
         }
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     */
+    protected function applyFolderFilter(Builder $query): void
+    {
+        $folder = $this->filterFolder;
+
+        if ($folder === '') {
+            return;
+        }
+
+        if ($folder === '__root__') {
+            $query->whereNull('folder');
+
+            return;
+        }
+
+        $query->where('folder', $folder);
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     */
+    protected function applyTagFilter(Builder $query): void
+    {
+        $tag = $this->filterTag;
+
+        if ($tag === '') {
+            return;
+        }
+
+        $query->whereJsonContains('tags', $tag);
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     */
+    protected function applyFavoritesFilter(Builder $query): void
+    {
+        if (! $this->filterFavorites) {
+            return;
+        }
+
+        $query->where('is_favorite', true);
+    }
+
+    /**
+     * @param  Builder<Model>  $query
+     */
+    protected function applyOwnershipScope(Builder $query): void
+    {
+        if (! (bool) config('file-picker.ownership.scope_to_owner', false)) {
+            return;
+        }
+
+        $userId = Auth::id();
+
+        if ($userId === null) {
+            $query->whereRaw('1 = 0');
+
+            return;
+        }
+
+        $query->where('user_id', is_numeric($userId) ? (int) $userId : 0);
     }
 
     /**
