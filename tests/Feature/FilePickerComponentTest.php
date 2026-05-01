@@ -245,10 +245,68 @@ it('mounts with pre-selected ids', function (): void {
 });
 
 it('mounts with single int selected as array', function (): void {
+    $media = FilePickerMedia::query()->create([
+        'filename' => 'mount-int',
+        'disk' => 'public',
+        'directory' => 'media',
+        'path' => 'media/mount-int.jpg',
+        'extension' => 'jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+    ]);
+
     Livewire::test(FilePicker::class, [
-        'selected' => [5],
+        'selected' => [$media->id],
     ])
-        ->assertSet('selected', [5]);
+        ->assertSet('selected', [$media->id]);
+});
+
+it('drops trashed ids from initial selected on mount', function (): void {
+    $active = FilePickerMedia::query()->create([
+        'filename' => 'active',
+        'disk' => 'public',
+        'directory' => 'media',
+        'path' => 'media/active.jpg',
+        'extension' => 'jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+    ]);
+
+    $trashed = FilePickerMedia::query()->create([
+        'filename' => 'trashed',
+        'disk' => 'public',
+        'directory' => 'media',
+        'path' => 'media/trashed.jpg',
+        'extension' => 'jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+    ]);
+    $trashed->delete();
+
+    Livewire::test(FilePicker::class, [
+        'selected' => [$active->id, $trashed->id, 9999],
+    ])
+        ->assertSet('selected', [$active->id]);
+});
+
+it('refuses to add a trashed item to selection via toggleSelection', function (): void {
+    $trashed = FilePickerMedia::query()->create([
+        'filename' => 'trashed',
+        'disk' => 'public',
+        'directory' => 'media',
+        'path' => 'media/trashed.jpg',
+        'extension' => 'jpg',
+        'mime_type' => 'image/jpeg',
+        'size' => 1024,
+    ]);
+    $trashed->delete();
+
+    Livewire::test(FilePicker::class, ['multiple' => true])
+        ->call('openModal')
+        ->call('setViewMode', 'trash')
+        ->call('toggleSelection', $trashed->id)
+        ->assertSet('selected', [])
+        ->assertSet('activeTrashId', $trashed->id);
 });
 
 it('starts and cancels editing alt text', function (): void {

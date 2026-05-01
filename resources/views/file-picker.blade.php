@@ -507,7 +507,7 @@
                                     <div class="fp-grid" wire:key="media-grid-{{ $renderTimestamp }}">
                                         @forelse ($mediaItems as $item)
                                             <div
-                                                class="fp-item {{ $this->isItemSelected($item['id']) ? 'fp-item-selected' : '' }}"
+                                                class="fp-item {{ $this->isItemActiveInView($item['id']) ? 'fp-item-selected' : '' }}"
                                                 wire:click="toggleSelection({{ $item['id'] }})"
                                                 wire:key="media-item-{{ $item['id'] }}-{{ $renderTimestamp }}"
                                                 title="{{ $item['filename'] }}">

@@ -70,6 +70,9 @@ class FilePicker extends Component
     /** Library view mode: 'library' (active) or 'trash' */
     public string $viewMode = 'library';
 
+    /** Currently focused trashed item (sidebar preview only — never form-bound) */
+    public ?int $activeTrashId = null;
+
     // =====================================================================
     // Upload State
     // =====================================================================
@@ -211,6 +214,7 @@ class FilePicker extends Component
         $this->perPage = $perPage;
 
         $this->selected = $this->normalizeSelectedInput($selected);
+        $this->pruneSelectedToExisting();
 
         $this->initializeCustomFilterValues();
     }
@@ -254,6 +258,7 @@ class FilePicker extends Component
     public function closeModal(): void
     {
         $this->showModal = false;
+        $this->activeTrashId = null;
         $this->resetUploadState();
         $this->cancelEditing();
         $this->cancelRenaming();
@@ -278,6 +283,7 @@ class FilePicker extends Component
 
         if ($this->viewMode !== $mode) {
             $this->selected = [];
+            $this->activeTrashId = null;
             $this->renderTimestamp = time();
             $this->dispatch('selection-updated', selected: $this->selected);
         }
@@ -494,6 +500,10 @@ class FilePicker extends Component
             return;
         }
 
+        if ($this->activeTrashId === $mediaId) {
+            $this->activeTrashId = null;
+        }
+
         $this->loadMediaItems();
         $this->dispatch('media-restored', mediaId: $mediaId);
     }
@@ -512,6 +522,10 @@ class FilePicker extends Component
             return;
         }
 
+        if ($this->activeTrashId === $mediaId) {
+            $this->activeTrashId = null;
+        }
+
         $this->loadMediaItems();
         $this->dispatch('media-force-deleted', mediaId: $mediaId);
     }
@@ -522,6 +536,10 @@ class FilePicker extends Component
     public function bulkDelete(array $mediaIds): void
     {
         $this->selected = array_values(array_diff($this->selected, $mediaIds));
+
+        if ($this->activeTrashId !== null && in_array($this->activeTrashId, $mediaIds, true)) {
+            $this->activeTrashId = null;
+        }
 
         if ($this->viewMode === 'trash') {
             $deleted = 0;
@@ -561,6 +579,10 @@ class FilePicker extends Component
         }
 
         $this->selected = array_values(array_diff($this->selected, $mediaIds));
+
+        if ($this->activeTrashId !== null && in_array($this->activeTrashId, $mediaIds, true)) {
+            $this->activeTrashId = null;
+        }
 
         $restored = 0;
 
@@ -757,6 +779,13 @@ class FilePicker extends Component
 
     public function toggleSelection(int $mediaId): void
     {
+        if ($this->viewMode === 'trash') {
+            $this->activeTrashId = $this->activeTrashId === $mediaId ? null : $mediaId;
+            $this->renderTimestamp = time();
+
+            return;
+        }
+
         $this->normalizeSelected();
 
         if ($this->multiple) {
@@ -771,6 +800,15 @@ class FilePicker extends Component
         if (! $this->showModal) {
             $this->dispatchSelectionToParent();
         }
+    }
+
+    public function isItemActiveInView(int $mediaId): bool
+    {
+        if ($this->viewMode === 'trash') {
+            return $this->activeTrashId === $mediaId;
+        }
+
+        return $this->isItemSelected($mediaId);
     }
 
     public function clearSelection(): void
@@ -821,6 +859,18 @@ class FilePicker extends Component
     #[Computed]
     public function activeMediaItem(): ?array
     {
+        if ($this->viewMode === 'trash') {
+            if ($this->activeTrashId === null) {
+                return null;
+            }
+
+            $media = $this->driver()->queryOnlyTrashed()
+                ->where('id', $this->activeTrashId)
+                ->first();
+
+            return $media === null ? null : $this->driver()->transform($media);
+        }
+
         $selectedItems = $this->selectedMediaItems();
 
         if ($selectedItems === []) {
