@@ -1371,8 +1371,11 @@
 .fp-thumbnail {
     position: relative;
     width: 100%;
-    height: var(--fp-config-thumbnail-height, 150px);
-    background: var(--fp-gray-100);
+    aspect-ratio: 1 / 1;
+    background:
+        linear-gradient(135deg,
+            var(--fp-gray-50) 0%,
+            var(--fp-gray-100) 100%);
     overflow: hidden;
     cursor: pointer;
 }
@@ -1385,7 +1388,7 @@
 }
 
 .fp-item:hover .fp-thumbnail img {
-    transform: scale(1.04);
+    transform: scale(1.05);
 }
 
 /* Type Badge */
@@ -1405,27 +1408,36 @@
 
 /* File Icon (non-image) */
 .fp-file-icon {
+    position: absolute;
+    inset: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    height: var(--fp-config-thumbnail-height, 150px);
-    background: var(--fp-gray-50);
-    color: var(--fp-gray-400);
-    gap: 8px;
+    background:
+        linear-gradient(135deg,
+            color-mix(in srgb, var(--fp-primary) 4%, white) 0%,
+            color-mix(in srgb, var(--fp-primary) 10%, white) 100%);
+    color: color-mix(in srgb, var(--fp-primary) 55%, var(--fp-gray-500));
+    gap: 10px;
 }
 
 .fp-file-icon svg {
-    width: 36px;
-    height: 36px;
+    width: 38%;
+    max-width: 64px;
+    height: auto;
+    filter: drop-shadow(0 2px 6px color-mix(in srgb, var(--fp-primary) 18%, transparent));
 }
 
 .fp-file-ext {
-    font-size: 11px;
+    padding: 3px 10px;
+    background: color-mix(in srgb, var(--fp-primary) 12%, white);
+    border-radius: 999px;
+    font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--fp-gray-500);
+    letter-spacing: 0.08em;
+    color: color-mix(in srgb, var(--fp-primary) 70%, var(--fp-gray-700));
 }
 
 /* Video Overlay */
@@ -1474,12 +1486,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
     margin-bottom: 2px;
+    letter-spacing: -0.01em;
 }
 
 .fp-item-meta {
     display: flex;
     align-items: center;
-    gap: 6px;
+    flex-wrap: wrap;
+    gap: 4px 6px;
     font-size: 11px;
     color: var(--fp-gray-400);
 }
@@ -1734,49 +1748,132 @@
     margin: 0;
 }
 
+.fp-sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--fp-border);
+}
+
+.fp-sidebar-body {
+    /* Acts as a single grouped container — overflow handling kicks in on mobile drawer */
+    display: contents;
+}
+
+.fp-sidebar-footer {
+    display: contents;
+}
+
 .fp-sidebar-title {
     font-size: 11px;
     font-weight: 700;
     color: var(--fp-gray-400);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    margin: 0 0 16px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--fp-border);
+    margin: 0;
+}
+
+.fp-sidebar-close {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: var(--fp-radius);
+    color: var(--fp-gray-500);
+    cursor: pointer;
+    transition: background var(--fp-duration) var(--fp-ease),
+                color var(--fp-duration) var(--fp-ease);
+}
+
+.fp-sidebar-close:hover {
+    background: var(--fp-gray-100);
+    color: var(--fp-gray-800);
+}
+
+.fp-sidebar-close svg {
+    width: 18px;
+    height: 18px;
+}
+
+.fp-sidebar-backdrop {
+    display: none;
 }
 
 .fp-sidebar-thumb {
+    position: relative;
     width: 100%;
-    background: white;
-    border-radius: var(--fp-radius);
+    aspect-ratio: 4 / 3;
+    background:
+        linear-gradient(135deg,
+            var(--fp-gray-50) 0%,
+            var(--fp-gray-100) 100%);
+    border-radius: var(--fp-radius-lg);
     overflow: hidden;
     margin-bottom: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 120px;
     border: 1px solid var(--fp-border);
 }
 
 .fp-sidebar-thumb img,
 .fp-sidebar-thumb video {
     width: 100%;
-    height: auto;
-    max-height: 200px;
+    height: 100%;
     object-fit: contain;
+    background: white;
+}
+
+/* File-icon placeholder used inside the sidebar preview */
+.fp-sidebar-file-icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    height: 100%;
+    background:
+        linear-gradient(135deg,
+            color-mix(in srgb, var(--fp-primary) 4%, white) 0%,
+            color-mix(in srgb, var(--fp-primary) 10%, white) 100%);
+    color: color-mix(in srgb, var(--fp-primary) 55%, var(--fp-gray-500));
+}
+
+.fp-sidebar-file-icon svg {
+    width: 56px;
+    height: 56px;
+    filter: drop-shadow(0 2px 8px color-mix(in srgb, var(--fp-primary) 22%, transparent));
 }
 
 .fp-sidebar-meta {
     font-size: 13px;
-    color: var(--fp-gray-600);
+    color: var(--fp-gray-500);
     line-height: 1.6;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.fp-sidebar-meta > div:not(.fp-meta-filename) {
+    font-size: 12px;
 }
 
 .fp-meta-filename {
+    font-size: 15px;
     font-weight: 600;
-    color: var(--fp-gray-800);
+    color: var(--fp-gray-900);
     word-break: break-word;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
+    line-height: 1.35;
+    letter-spacing: -0.01em;
 }
 
 .fp-sidebar-divider {
@@ -2014,6 +2111,29 @@
 /* -------------------------------------------------------------------
    17. RESPONSIVE
    ------------------------------------------------------------------- */
+
+/* Touch devices (any width): always reveal hover-only affordances and
+   bump the tap targets on per-item controls. */
+@media (hover: none) and (pointer: coarse) {
+    .fp-item-favorite,
+    .fp-pending-remove {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .fp-item-select,
+    .fp-item-favorite {
+        width: 30px;
+        height: 30px;
+    }
+
+    .fp-item-favorite {
+        font-size: 16px;
+        left: 46px; /* keep clearance from selection circle */
+    }
+}
+
+/* Tablet & below */
 @media (max-width: 768px) {
     .fp-backdrop {
         padding: 8px;
@@ -2025,12 +2145,24 @@
 
     .fp-header {
         padding: 12px 16px;
+        gap: 8px;
     }
 
     .fp-header-left {
+        flex: 1;
         flex-direction: column;
         align-items: flex-start;
         gap: 8px;
+    }
+
+    .fp-modal-tabs {
+        align-self: stretch;
+        justify-content: center;
+    }
+
+    .fp-modal-tabs .fp-tab {
+        flex: 1;
+        text-align: center;
     }
 
     .fp-toolbar-row {
@@ -2048,24 +2180,27 @@
     }
 
     .fp-type-pill {
-        padding: 4px 10px;
+        padding: 6px 12px;
         font-size: 12px;
-        height: 30px;
+        height: 34px;
     }
 
     .fp-type-pill-icon {
-        width: 13px;
-        height: 13px;
+        width: 14px;
+        height: 14px;
     }
 
     .fp-toolbar-actions {
+        flex-wrap: wrap;
         padding-top: 8px;
         padding-bottom: 8px;
         gap: 6px;
     }
 
     .fp-search-wrap {
-        min-width: 140px;
+        flex: 1 1 100%;
+        order: -1; /* search jumps to its own row at the top */
+        min-width: 0;
         max-width: none;
     }
 
@@ -2074,9 +2209,14 @@
     }
 
     .fp-toolbar-upload-btn {
-        width: 34px;
+        width: 38px;
         padding: 0;
         justify-content: center;
+    }
+
+    .fp-toolbar-icon-btn {
+        width: 38px;
+        height: 38px;
     }
 
     .fp-selection-bar {
@@ -2085,24 +2225,105 @@
         align-items: flex-start;
     }
 
+    /* Layout becomes a relative container so the sidebar can be an overlay drawer */
     .fp-library-layout {
-        flex-direction: column;
+        position: relative;
     }
 
     .fp-library-main {
         padding: 12px 16px;
+        width: 100%;
     }
 
     .fp-library-sidebar {
-        width: 100%;
-        border-left: none;
+        position: absolute;
+        inset: 0 0 0 auto;
+        width: min(100%, 420px);
+        max-height: none;
+        transform: translateX(100%);
+        transition: transform 0.28s var(--fp-ease-spring);
+        box-shadow: -10px 0 28px -10px rgba(0, 0, 0, 0.18);
+        border-left: 1px solid var(--fp-border);
+        border-top: none;
+        z-index: 10;
+        background: white;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .fp-library-sidebar.fp-library-sidebar--open {
+        transform: translateX(0);
+    }
+
+    .fp-sidebar-close {
+        display: flex;
+    }
+
+    /* Drawer 3-section layout: sticky header, scrollable body, sticky footer */
+    .fp-library-sidebar .fp-sidebar-header {
+        flex-shrink: 0;
+        margin: 0;
+        padding: 14px 18px;
+        background: white;
+    }
+
+    .fp-library-sidebar .fp-sidebar-body {
+        display: block;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        padding: 16px 18px;
+    }
+
+    .fp-library-sidebar .fp-sidebar-footer {
+        display: block;
+        flex-shrink: 0;
+        padding: 12px 18px;
+        background: white;
         border-top: 1px solid var(--fp-border);
-        max-height: 260px;
+    }
+
+    /* Empty state still gets a bit of padding when drawer happens to render it */
+    .fp-library-sidebar .fp-sidebar-empty {
+        padding: 24px 18px;
+    }
+
+    .fp-sidebar-backdrop {
+        display: block;
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.42);
+        z-index: 9;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s var(--fp-ease);
+    }
+
+    .fp-sidebar-backdrop.fp-sidebar-backdrop--open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .fp-sidebar-thumb {
+        aspect-ratio: 4 / 3;
+        max-height: 240px;
     }
 
     .fp-grid {
         grid-template-columns: repeat(var(--fp-config-grid-columns-sm, 3), minmax(0, 1fr));
         gap: 10px;
+    }
+
+    .fp-item-info {
+        padding: 8px 10px;
+    }
+
+    .fp-item-name {
+        font-size: 12.5px;
     }
 
     .fp-upload-body {
@@ -2145,6 +2366,24 @@
         gap: 8px;
     }
 
+    .fp-pagination {
+        padding: 10px 16px;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .fp-pagination-info {
+        flex: 1 1 100%;
+        text-align: center;
+        order: 2;
+    }
+
+    .fp-page-btn {
+        width: 36px;
+        height: 36px;
+    }
+
     .fp-footer {
         flex-direction: column;
         gap: 12px;
@@ -2153,18 +2392,45 @@
     }
 
     .fp-footer-right {
-        justify-content: flex-end;
+        display: flex;
+        gap: 8px;
+    }
+
+    .fp-footer-right .fp-btn {
+        flex: 1;
+        min-height: 42px;
     }
 }
 
+/* Mobile (small phones) */
 @media (max-width: 480px) {
     .fp-backdrop {
         padding: 0;
     }
 
+    /* Bottom-sheet feel: rounded top, flush to viewport edges,
+       respect notches via safe-area insets. */
     .fp-modal {
         border-radius: var(--fp-radius-lg) var(--fp-radius-lg) 0 0;
-        margin-top: 16px;
+        margin-top: env(safe-area-inset-top, 0px);
+    }
+
+    .fp-header {
+        padding: 10px 12px;
+    }
+
+    .fp-title {
+        font-size: 16px;
+    }
+
+    .fp-close {
+        width: 40px;
+        height: 40px;
+    }
+
+    .fp-modal-tabs .fp-tab {
+        padding: 8px 12px;
+        font-size: 12px;
     }
 
     .fp-type-pill span {
@@ -2172,11 +2438,17 @@
     }
 
     .fp-type-pill {
-        padding: 4px 8px;
+        padding: 6px 10px;
+        height: 36px;
     }
 
     .fp-toolbar-separator {
         display: none;
+    }
+
+    .fp-toolbar-row {
+        padding-left: 10px;
+        padding-right: 10px;
     }
 
     .fp-dropzone-hero {
@@ -2229,6 +2501,66 @@
     .fp-grid {
         grid-template-columns: repeat(var(--fp-config-grid-columns-xs, 2), minmax(0, 1fr));
         gap: 8px;
+    }
+
+    .fp-item-info {
+        padding: 8px;
+    }
+
+    .fp-item-meta {
+        font-size: 10.5px;
+    }
+
+    /* Hide secondary date in tightest layouts so filename has room */
+    .fp-item-date {
+        display: none;
+    }
+
+    /* On phones, drawer takes full width; padding now lives on inner sections */
+    .fp-library-sidebar {
+        width: 100%;
+    }
+
+    .fp-library-sidebar .fp-sidebar-header,
+    .fp-library-sidebar .fp-sidebar-footer {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+
+    .fp-library-sidebar .fp-sidebar-body {
+        padding: 14px;
+    }
+
+    .fp-sidebar-thumb {
+        aspect-ratio: 4 / 3;
+        max-height: 200px;
+    }
+
+    .fp-meta-filename {
+        font-size: 14px;
+    }
+
+    .fp-pagination-info {
+        display: none; /* keep just the controls — info clutters tiny screens */
+    }
+
+    .fp-pagination {
+        justify-content: center;
+    }
+
+    .fp-page-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .fp-footer {
+        padding: 10px 12px 14px;
+        padding-bottom: max(14px, env(safe-area-inset-bottom));
+    }
+
+    .fp-footer-right .fp-btn {
+        min-height: 46px; /* ~Apple HIG tap target */
+        font-size: 14px;
     }
 }
 

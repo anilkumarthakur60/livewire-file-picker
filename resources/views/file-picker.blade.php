@@ -6,9 +6,6 @@
             </path>
         </svg>
         <span>{{ $buttonLabel }}</span>
-        @if (!empty($selected))
-            <span class="fp-trigger-badge">{{ count($selected) }}</span>
-        @endif
     </button>
 
     @if ($showModal)
@@ -502,8 +499,11 @@
                              MEDIA LIBRARY TAB
                              ======================================================== --}}
                         @if ($currentTab === 'library')
-                            <div class="fp-library-layout">
-                                <div class="fp-library-main">
+                            <div class="fp-library-layout"
+                                 x-data="{ detailsOpen: true }"
+                                 x-on:open-details.window="detailsOpen = true">
+                                <div class="fp-library-main"
+                                     x-on:click="detailsOpen = true">
                                     <div class="fp-grid" wire:key="media-grid-{{ $renderTimestamp }}">
                                         @forelse ($mediaItems as $item)
                                             <div
@@ -641,11 +641,30 @@
                                     @endif
                                 </div>
 
+                                {{-- Mobile drawer backdrop --}}
+                                <div class="fp-sidebar-backdrop"
+                                     :class="{ 'fp-sidebar-backdrop--open': detailsOpen && {{ $this->activeMediaItem ? 'true' : 'false' }} }"
+                                     x-on:click="detailsOpen = false"></div>
+
                                 {{-- Sidebar: Attachment Details --}}
-                                <div class="fp-library-sidebar">
+                                <div class="fp-library-sidebar"
+                                     :class="{ 'fp-library-sidebar--open': detailsOpen && {{ $this->activeMediaItem ? 'true' : 'false' }} }">
                                     @if ($this->activeMediaItem)
                                         @php $active = $this->activeMediaItem; @endphp
-                                        <h3 class="fp-sidebar-title">{{ config('file-picker.texts.sidebar_title', 'Attachment Details') }}</h3>
+                                        <div class="fp-sidebar-header">
+                                            <h3 class="fp-sidebar-title">{{ config('file-picker.texts.sidebar_title', 'Attachment Details') }}</h3>
+                                            <button type="button"
+                                                    class="fp-sidebar-close"
+                                                    x-on:click="detailsOpen = false"
+                                                    aria-label="{{ config('file-picker.texts.close_details', 'Close details') }}">
+                                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                          stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                                </svg>
+                                            </button>
+                                        </div>
+
+                                        <div class="fp-sidebar-body">
 
                                         {{-- Thumbnail Preview --}}
                                         <div class="fp-sidebar-thumb">
@@ -656,9 +675,8 @@
                                                 <video src="{{ $active['url'] }}" style="width:100%;max-height:200px"
                                                        controls></video>
                                             @else
-                                                <div class="fp-file-icon" style="height:120px">
-                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                                                         style="width:40px;height:40px">
+                                                <div class="fp-sidebar-file-icon">
+                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                         <path stroke-linecap="round" stroke-linejoin="round"
                                                               stroke-width="1.5" d="{{ $active['icon'] }}"></path>
                                                     </svg>
@@ -765,6 +783,10 @@
                                             </div>
                                         @endif
 
+                                        </div> {{-- /fp-sidebar-body --}}
+
+                                        <div class="fp-sidebar-footer">
+
                                         {{-- Sidebar action buttons --}}
                                         <div class="fp-sidebar-actions" style="display:flex;flex-wrap:wrap;gap:8px;">
                                             @if (config('file-picker.features.favorites', true))
@@ -825,6 +847,8 @@
                                                 </button>
                                             </div>
                                         @endif
+
+                                        </div> {{-- /fp-sidebar-footer --}}
                                     @else
                                         <div class="fp-sidebar-empty">
                                             <p>{{ config('file-picker.texts.sidebar_empty', 'Select a file to view details') }}</p>
