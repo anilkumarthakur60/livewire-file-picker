@@ -17,7 +17,11 @@
         /* Dimensions */
         --fp-config-thumbnail-height: {{ config('file-picker.ui.thumbnail_height', 150) }}px;
         --fp-config-radius: {{ config('file-picker.ui.border_radius', 8) }}px;
-        --fp-config-grid-min-width: {{ config('file-picker.ui.grid_min_width', 160) }}px;
+        --fp-config-grid-columns-xs: {{ (int) config('file-picker.ui.grid_columns_xs', 2) }};
+        --fp-config-grid-columns-sm: {{ (int) config('file-picker.ui.grid_columns_sm', 3) }};
+        --fp-config-grid-columns-md: {{ (int) config('file-picker.ui.grid_columns_md', 4) }};
+        --fp-config-grid-columns: {{ (int) config('file-picker.ui.grid_columns', 6) }};
+        --fp-config-grid-columns-xl: {{ (int) config('file-picker.ui.grid_columns_xl', 8) }};
         --fp-config-grid-gap: {{ config('file-picker.ui.grid_gap', 14) }}px;
         --fp-config-sidebar-width: {{ config('file-picker.ui.sidebar_width', 300) }}px;
 

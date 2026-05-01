@@ -1232,8 +1232,22 @@
    ------------------------------------------------------------------- */
 .fp-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(var(--fp-config-grid-min-width, 160px), 1fr));
+    grid-template-columns: repeat(var(--fp-config-grid-columns, 6), minmax(0, 1fr));
     gap: var(--fp-config-grid-gap, 14px);
+}
+
+/* Extra large screens: bump to wider grid */
+@media (min-width: 1536px) {
+    .fp-grid {
+        grid-template-columns: repeat(var(--fp-config-grid-columns-xl, 8), minmax(0, 1fr));
+    }
+}
+
+/* Medium screens (tablet landscape / small laptop) */
+@media (max-width: 1024px) {
+    .fp-grid {
+        grid-template-columns: repeat(var(--fp-config-grid-columns-md, 4), minmax(0, 1fr));
+    }
 }
 
 .fp-item {
@@ -2087,7 +2101,7 @@
     }
 
     .fp-grid {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        grid-template-columns: repeat(var(--fp-config-grid-columns-sm, 3), minmax(0, 1fr));
         gap: 10px;
     }
 
@@ -2213,7 +2227,7 @@
     }
 
     .fp-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(var(--fp-config-grid-columns-xs, 2), minmax(0, 1fr));
         gap: 8px;
     }
 }

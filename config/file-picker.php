@@ -152,8 +152,12 @@ return [
         'font_family' => "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         'border_radius' => 8, // px
 
-        // Grid layout
-        'grid_min_width' => 160, // px — min column width in media grid
+        // Grid layout — columns per breakpoint
+        'grid_columns_xs' => 2, // < 480px
+        'grid_columns_sm' => 3, // 481–768px
+        'grid_columns_md' => 4, // 769–1024px
+        'grid_columns' => 6, // 1025–1535px (large / default desktop)
+        'grid_columns_xl' => 8, // ≥ 1536px (extra large)
         'grid_gap' => 14, // px — gap between grid items
 
         // Sidebar
