@@ -1301,6 +1301,58 @@
     opacity: 1;
 }
 
+/* Favorite Star */
+.fp-item-favorite {
+    position: absolute;
+    top: 8px;
+    left: 40px;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid var(--fp-gray-300);
+    color: var(--fp-gray-500);
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity var(--fp-duration) var(--fp-ease),
+                transform var(--fp-duration) var(--fp-ease),
+                color var(--fp-duration) var(--fp-ease),
+                border-color var(--fp-duration) var(--fp-ease),
+                background var(--fp-duration) var(--fp-ease);
+    backdrop-filter: blur(4px);
+}
+
+.fp-item:hover .fp-item-favorite,
+.fp-item-favorite-active,
+.fp-item-favorite:focus-visible {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.fp-item-favorite:hover {
+    color: #f59e0b;
+    border-color: #f59e0b;
+    transform: scale(1.1);
+}
+
+.fp-item-favorite-active {
+    background: #fef3c7;
+    border-color: #f59e0b;
+    color: #f59e0b;
+}
+
+.fp-item-favorite-active:hover {
+    background: #fde68a;
+}
+
 /* Thumbnail */
 .fp-thumbnail {
     position: relative;

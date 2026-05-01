@@ -129,7 +129,7 @@ abstract class AbstractDriver implements MediaDriverInterface
             return null;
         }
 
-        return $this->query()->where('hash', $hash)->first();
+        return $this->queryWithTrashed()->where('hash', $hash)->first();
     }
 
     public function delete(int $id): bool

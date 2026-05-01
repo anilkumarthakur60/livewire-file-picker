@@ -276,6 +276,12 @@ class FilePicker extends Component
             return;
         }
 
+        if ($this->viewMode !== $mode) {
+            $this->selected = [];
+            $this->renderTimestamp = time();
+            $this->dispatch('selection-updated', selected: $this->selected);
+        }
+
         $this->viewMode = $mode;
         $this->resetPagination();
         $this->loadMediaItems();
@@ -517,10 +523,62 @@ class FilePicker extends Component
     {
         $this->selected = array_values(array_diff($this->selected, $mediaIds));
 
+        if ($this->viewMode === 'trash') {
+            $deleted = 0;
+
+            foreach ($mediaIds as $id) {
+                if (! $this->authorization()->canForceDelete($id)) {
+                    continue;
+                }
+
+                try {
+                    $this->driver()->forceDelete($id);
+                    $deleted++;
+                } catch (MediaNotFoundException) {
+                    // skip
+                }
+            }
+
+            $this->loadMediaItems();
+            $this->dispatch('media-bulk-force-deleted', count: $deleted);
+
+            return;
+        }
+
         $deleted = $this->deleteMediaByIds($mediaIds);
 
         $this->loadMediaItems();
         $this->dispatch('media-bulk-deleted', count: $deleted);
+    }
+
+    /**
+     * @param  array<int>  $mediaIds
+     */
+    public function bulkRestore(array $mediaIds): void
+    {
+        if (! (bool) config('file-picker.features.trash', true)) {
+            return;
+        }
+
+        $this->selected = array_values(array_diff($this->selected, $mediaIds));
+
+        $restored = 0;
+
+        foreach ($mediaIds as $id) {
+            if (! $this->authorization()->canRestore($id)) {
+                continue;
+            }
+
+            try {
+                $this->driver()->restore($id);
+                $restored++;
+            } catch (MediaNotFoundException) {
+                // skip
+            }
+        }
+
+        $this->loadMediaItems();
+        $this->dispatch('media-bulk-restored', count: $restored);
     }
 
     // =====================================================================
@@ -728,7 +786,12 @@ class FilePicker extends Component
 
     public function insertSelected(): void
     {
+        if ($this->viewMode !== 'library') {
+            return;
+        }
+
         $this->normalizeSelected();
+        $this->pruneSelectedToExisting();
         $this->dispatchSelectionToParent();
         $this->closeModal();
     }
@@ -818,6 +881,30 @@ class FilePicker extends Component
     // =====================================================================
     // Private Helpers
     // =====================================================================
+
+    private function pruneSelectedToExisting(): void
+    {
+        if ($this->selected === []) {
+            return;
+        }
+
+        $items = $this->driver()->findByIds($this->selected);
+
+        /** @var array<int> $existingIds */
+        $existingIds = [];
+
+        foreach ($items as $item) {
+            $key = $item->getKey();
+
+            if (is_int($key)) {
+                $existingIds[] = $key;
+            } elseif (is_numeric($key)) {
+                $existingIds[] = (int) $key;
+            }
+        }
+
+        $this->selected = array_values(array_intersect($this->selected, $existingIds));
+    }
 
     private function dispatchSelectionToParent(): void
     {

@@ -6,6 +6,7 @@ namespace Anil\LivewireFilePicker\Drivers;
 
 use Anil\LivewireFilePicker\Contracts\MediaTransformerInterface;
 use Anil\LivewireFilePicker\Events\MediaReplaced;
+use Anil\LivewireFilePicker\Events\MediaRestored;
 use Anil\LivewireFilePicker\Events\MediaUploaded;
 use Anil\LivewireFilePicker\Exceptions\DuplicateMediaException;
 use Anil\LivewireFilePicker\Exceptions\StorageQuotaExceededException;
@@ -73,7 +74,14 @@ final class DefaultDriver extends AbstractDriver
                 /** @var string $strategy */
                 $strategy = config('file-picker.duplicate_detection.strategy', 'reuse');
 
+                $isTrashed = method_exists($existing, 'trashed') && $existing->trashed();
+
                 if ($strategy === 'reuse') {
+                    if ($isTrashed && method_exists($existing, 'restore')) {
+                        $existing->restore();
+                        MediaRestored::dispatch($existing, $this->driverName());
+                    }
+
                     return $existing;
                 }
 
@@ -317,7 +325,7 @@ final class DefaultDriver extends AbstractDriver
         $userQuota = config('file-picker.storage_quota.per_user', 0);
 
         if ($globalQuota > 0) {
-            $used = (int) $this->query()->sum('size');
+            $used = (int) $this->queryWithTrashed()->sum('size');
 
             if ($used + $incomingSize > $globalQuota) {
                 throw StorageQuotaExceededException::global($used + $incomingSize, $globalQuota);
@@ -328,7 +336,7 @@ final class DefaultDriver extends AbstractDriver
             $userId = $this->resolveUserId($options);
 
             if ($userId !== null) {
-                $used = (int) $this->query()->where('user_id', $userId)->sum('size');
+                $used = (int) $this->queryWithTrashed()->where('user_id', $userId)->sum('size');
 
                 if ($used + $incomingSize > $userQuota) {
                     throw StorageQuotaExceededException::forUser($userId, $used + $incomingSize, $userQuota);

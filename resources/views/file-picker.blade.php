@@ -524,9 +524,11 @@
                                                 @if (config('file-picker.features.favorites', true) && $viewMode === 'library')
                                                     <button type="button"
                                                             wire:click.stop="toggleFavorite({{ $item['id'] }})"
+                                                            class="fp-item-favorite {{ ($item['is_favorite'] ?? false) ? 'fp-item-favorite-active' : '' }}"
                                                             title="{{ ($item['is_favorite'] ?? false) ? 'Unfavorite' : 'Favorite' }}"
-                                                            style="position:absolute;top:6px;left:6px;width:24px;height:24px;border:0;background:rgba(0,0,0,0.4);border-radius:50%;color:{{ ($item['is_favorite'] ?? false) ? '#fbbf24' : '#fff' }};cursor:pointer;font-size:14px;line-height:1;z-index:2;">
-                                                        {{ ($item['is_favorite'] ?? false) ? '★' : '☆' }}
+                                                            aria-pressed="{{ ($item['is_favorite'] ?? false) ? 'true' : 'false' }}"
+                                                            aria-label="{{ ($item['is_favorite'] ?? false) ? 'Unfavorite' : 'Favorite' }}">
+                                                        <span aria-hidden="true">{{ ($item['is_favorite'] ?? false) ? '★' : '☆' }}</span>
                                                     </button>
                                                 @endif
 
@@ -916,14 +918,7 @@
 
 </div>
 
-@once
-    @push('head')
-        <link rel="stylesheet" href="{{ asset('vendor/anil/livewire-file-picker/file-picker.css') }}">
-    @endpush
-@endonce
-
-@once
-    @push('scripts')
-        <script src="{{ asset('vendor/anil/livewire-file-picker/file-picker.js') }}" defer></script>
-    @endpush
-@endonce
+@assets
+    <link rel="stylesheet" href="{{ asset('vendor/anil/livewire-file-picker/file-picker.css') }}">
+    <script src="{{ asset('vendor/anil/livewire-file-picker/file-picker.js') }}" defer></script>
+@endassets
