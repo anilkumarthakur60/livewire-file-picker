@@ -48,7 +48,7 @@ final class InstallCommand extends Command
     private function publishConfig(): void
     {
         $target = config_path('file-picker.php');
-        $force  = $this->option('force');
+        $force = $this->option('force');
 
         if (File::exists($target) && ! $force) {
             $this->components->twoColumnDetail(
@@ -60,7 +60,7 @@ final class InstallCommand extends Command
         }
 
         $this->callSilently('vendor:publish', [
-            '--tag'   => 'file-picker-config',
+            '--tag' => 'file-picker-config',
             '--force' => $force,
         ]);
 
@@ -72,7 +72,7 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag'   => 'file-picker-migrations',
+            '--tag' => 'file-picker-migrations',
             '--force' => $force,
         ]);
 
@@ -109,7 +109,7 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag'   => 'file-picker-views',
+            '--tag' => 'file-picker-views',
             '--force' => $force,
         ]);
 
@@ -124,7 +124,7 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag'   => 'file-picker-assets',
+            '--tag' => 'file-picker-assets',
             '--force' => $force,
         ]);
 
@@ -139,7 +139,7 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag'   => 'file-picker-lang',
+            '--tag' => 'file-picker-lang',
             '--force' => $force,
         ]);
 

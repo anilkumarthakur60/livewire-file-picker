@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 use Anil\LivewireFilePicker\Contracts\MediaDriverInterface;
@@ -7,13 +8,13 @@ use Anil\LivewireFilePicker\Models\FilePickerMedia;
 function tagFolderMedia(array $overrides = []): FilePickerMedia
 {
     return FilePickerMedia::query()->create(array_merge([
-        'filename'  => 'tag-test',
-        'disk'      => 'public',
+        'filename' => 'tag-test',
+        'disk' => 'public',
         'directory' => 'media',
-        'path'      => 'media/tag-test.jpg',
+        'path' => 'media/tag-test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
-        'size'      => 1024,
+        'size' => 1024,
     ], $overrides));
 }
 
