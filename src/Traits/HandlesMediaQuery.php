@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @property string $search
@@ -66,10 +67,14 @@ trait HandlesMediaQuery
         }
 
         $searchTerm = '%'.$search.'%';
+        $table = $query->getModel()->getTable();
+        $hasAlt = Schema::hasColumn($table, 'alt');
 
-        $query->where(function (Builder $q) use ($searchTerm): void {
-            $q->where('filename', 'like', $searchTerm)
-                ->orWhere('alt', 'like', $searchTerm);
+        $query->where(function (Builder $q) use ($searchTerm, $hasAlt): void {
+            $q->where('filename', 'like', $searchTerm);
+            if ($hasAlt) {
+                $q->orWhere('alt', 'like', $searchTerm);
+            }
         });
     }
 

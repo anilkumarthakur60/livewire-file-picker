@@ -21,7 +21,7 @@ class Media extends Model
 
 class MediaUploader
 {
-    public function fromSource(string $source): self
+    public function fromSource(mixed $source): self
     {
         return $this;
     }

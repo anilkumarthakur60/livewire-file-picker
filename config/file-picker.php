@@ -19,7 +19,7 @@ return [
     |
     */
 
-    'driver' => env('FILE_PICKER_DRIVER', 'plank'),
+    'driver' => env('FILE_PICKER_DRIVER', 'default'),
 
     /*
     |--------------------------------------------------------------------------
