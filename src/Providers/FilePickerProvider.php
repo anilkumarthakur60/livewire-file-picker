@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Anil\LivewireFilePicker\Providers;
 
+use Anil\LivewireFilePicker\Commands\InstallCommand;
 use Anil\LivewireFilePicker\Console\PruneOrphansCommand;
 use Anil\LivewireFilePicker\Console\PruneTrashCommand;
 use Anil\LivewireFilePicker\Console\StatsCommand;
@@ -110,6 +111,8 @@ final class FilePickerProvider extends ServiceProvider
             PruneTrashCommand::class,
             PruneOrphansCommand::class,
             StatsCommand::class,
+            InstallCommand::class,
+
         ]);
     }
 
