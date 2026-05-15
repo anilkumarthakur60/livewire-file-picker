@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Anil\LivewireFilePicker\Drivers;
 
 use Anil\LivewireFilePicker\Contracts\MediaTransformerInterface;
+use Anil\LivewireFilePicker\Events\MediaMovedToFolder;
 use Anil\LivewireFilePicker\Events\MediaReplaced;
 use Anil\LivewireFilePicker\Events\MediaRestored;
 use Anil\LivewireFilePicker\Events\MediaUploaded;
@@ -209,6 +210,45 @@ final class DefaultDriver extends AbstractDriver
         MediaReplaced::dispatch($media, $oldPath, $newStoredPath, $this->driverName());
 
         return $media;
+    }
+
+    public function moveToFolder(int $id, ?string $folder): bool
+    {
+        $media = $this->findByIdOrFail($id);
+
+        $oldFolder = $media->getAttribute('folder');
+        $oldFolderString = is_string($oldFolder) ? $oldFolder : null;
+
+        $newFolder = $folder !== null && trim($folder) !== '' ? trim($folder) : null;
+
+        if ($oldFolderString === $newFolder) {
+            return false;
+        }
+
+        $oldPath = is_string($media->getAttribute('path')) ? $media->getAttribute('path') : '';
+        $disk = is_string($media->getAttribute('disk')) ? $media->getAttribute('disk') : $this->disk;
+
+        $newDirectory = $newFolder !== null
+            ? rtrim($this->directory, '/').'/'.trim($newFolder, '/')
+            : $this->directory;
+
+        if ($oldPath !== '') {
+            $newPath = rtrim($newDirectory, '/').'/'.basename($oldPath);
+
+            if ($oldPath !== $newPath && Storage::disk($disk)->exists($oldPath)) {
+                Storage::disk($disk)->move($oldPath, $newPath);
+            }
+
+            $media->setAttribute('path', $newPath);
+            $media->setAttribute('directory', $newDirectory);
+        }
+
+        $media->setAttribute('folder', $newFolder);
+        $media->save();
+
+        MediaMovedToFolder::dispatch($id, $oldFolderString, $newFolder, $this->driverName());
+
+        return true;
     }
 
     protected function modelClass(): string
