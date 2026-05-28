@@ -48,8 +48,16 @@ document.addEventListener('livewire:init', () => {
         const backdrop = document.querySelector('.fp-backdrop');
         if (!backdrop) return;
 
-        // Escape to close modal
+        // Escape: close the detail sheet first if it's open on a tablet/mobile
+        // viewport; otherwise close the whole modal.
         if (e.key === 'Escape') {
+            const sheetOpen = document.querySelector('.fp-library-sidebar.fp-library-sidebar--open');
+            if (sheetOpen && window.innerWidth <= 1024) {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('close-details'));
+                return;
+            }
+
             e.preventDefault();
             Livewire.dispatch('closeModal');
         }
