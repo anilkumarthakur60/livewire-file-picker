@@ -10,6 +10,7 @@ use Anil\LivewireFilePicker\Enums\FileType;
 use Anil\LivewireFilePicker\Exceptions\DuplicateMediaException;
 use Anil\LivewireFilePicker\Exceptions\StorageQuotaExceededException;
 use Anil\LivewireFilePicker\Exceptions\UploadFailedException;
+use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
 
@@ -50,8 +51,24 @@ trait HandlesFileUpload
             return;
         }
 
-        $this->validateUploadedFiles();
+        try {
+            $this->validateUploadedFiles();
+        } catch (ValidationException $e) {
+            $this->uploadMessage = count($e->validator->errors()->all()) === 1
+                ? $e->validator->errors()->first()
+                : 'Some files could not be uploaded. See the errors below.';
+            $this->uploadStatus = 'error';
+
+            throw $e;
+        }
+
         $this->processUpload();
+    }
+
+    public function setUploadError(string $message): void
+    {
+        $this->uploadMessage = $message;
+        $this->uploadStatus = 'error';
     }
 
     public function removePendingFile(int $index): void
@@ -146,7 +163,10 @@ trait HandlesFileUpload
             $this->isUploading = false;
             $this->cleanupTemporaryFiles();
             $this->uploadedFiles = [];
-            $this->dispatch('clearUploadMessage');
+
+            if ($this->uploadStatus !== 'error') {
+                $this->dispatch('clearUploadMessage');
+            }
         }
     }
 

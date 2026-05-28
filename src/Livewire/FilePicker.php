@@ -769,7 +769,10 @@ class FilePicker extends Component
         } finally {
             $this->cancelReplacing();
             $this->loadMediaItems();
-            $this->dispatch('clearUploadMessage');
+
+            if ($this->uploadStatus !== 'error') {
+                $this->dispatch('clearUploadMessage');
+            }
         }
     }
 
