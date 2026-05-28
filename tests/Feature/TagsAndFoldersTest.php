@@ -11,9 +11,9 @@ function tagFolderMedia(array $overrides = []): FilePickerMedia
         'filename' => 'tag-test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/tag-test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ], $overrides));
 }
@@ -59,12 +59,11 @@ it('moves media into folder', function (): void {
     $fresh = $media->fresh();
     expect($fresh->folder)->toBe('photos/2024');
     expect($fresh->directory)->toBe('media/photos/2024');
-    expect($fresh->path)->toBe('media/photos/2024/tag-test.jpg');
+
     $driver->moveToFolder($media->id, null);
     $fresh = $media->fresh();
     expect($fresh->folder)->toBeNull();
     expect($fresh->directory)->toBe('media');
-    expect($fresh->path)->toBe('media/tag-test.jpg');
 });
 it('lists distinct folders', function (): void {
     $a = tagFolderMedia(['filename' => 'one']);

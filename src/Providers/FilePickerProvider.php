@@ -11,7 +11,6 @@ use Anil\LivewireFilePicker\Console\StatsCommand;
 use Anil\LivewireFilePicker\Contracts\FilePickerAuthorizationInterface;
 use Anil\LivewireFilePicker\Contracts\MediaDriverInterface;
 use Anil\LivewireFilePicker\Contracts\MediaTransformerInterface;
-use Anil\LivewireFilePicker\Drivers\DefaultDriver;
 use Anil\LivewireFilePicker\Drivers\PlankMediaDriver;
 use Anil\LivewireFilePicker\Exceptions\DriverNotFoundException;
 use Anil\LivewireFilePicker\Livewire\FilePicker;
@@ -86,11 +85,7 @@ final class FilePickerProvider extends ServiceProvider
 
     private function registerMigrations(): void
     {
-        /** @var string $driver */
-        $driver = config('file-picker.driver', 'default');
-        if ($driver === 'default') {
-            $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
-        }
+        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
     }
 
     private function registerCommands(): void
@@ -128,12 +123,11 @@ final class FilePickerProvider extends ServiceProvider
         });
         $this->app->singleton(MediaDriverInterface::class, function (): MediaDriverInterface {
             /** @var string $driverName */
-            $driverName = config('file-picker.driver', 'default');
+            $driverName = config('file-picker.driver', 'plank');
             /** @var MediaTransformerInterface $transformer */
             $transformer = app(MediaTransformerInterface::class);
 
             return match ($driverName) {
-                'default' => new DefaultDriver($transformer),
                 'plank' => new PlankMediaDriver($transformer),
                 default => $this->resolveCustomDriver($driverName, $transformer),
             };

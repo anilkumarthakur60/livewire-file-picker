@@ -57,9 +57,9 @@ it('toggles single selection', function (): void {
         'filename' => 'test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -75,9 +75,9 @@ it('toggles multiple selection', function (): void {
         'filename' => 'first',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/first.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -85,9 +85,9 @@ it('toggles multiple selection', function (): void {
         'filename' => 'second',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/second.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 2048,
     ]);
 
@@ -103,9 +103,9 @@ it('respects max files limit', function (): void {
         'filename' => 'first',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/first.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -113,9 +113,9 @@ it('respects max files limit', function (): void {
         'filename' => 'second',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/second.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 2048,
     ]);
 
@@ -131,9 +131,9 @@ it('clears selection', function (): void {
         'filename' => 'test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -149,9 +149,9 @@ it('loads media items when modal opens', function (): void {
         'filename' => 'test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -166,9 +166,9 @@ it('deletes media and removes from selection', function (): void {
         'filename' => 'to-delete',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/to-delete.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -205,9 +205,9 @@ it('paginates media', function (): void {
             'filename' => "file-{$i}",
             'disk' => 'public',
             'directory' => 'media',
-            'path' => "media/file-{$i}.jpg",
             'extension' => 'jpg',
             'mime_type' => 'image/jpeg',
+            'aggregate_type' => 'image',
             'size' => 1024,
         ]);
     }
@@ -232,9 +232,9 @@ it('mounts with pre-selected ids', function (): void {
         'filename' => 'pre-selected',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/pre-selected.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -249,9 +249,9 @@ it('mounts with single int selected as array', function (): void {
         'filename' => 'mount-int',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/mount-int.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -266,9 +266,9 @@ it('drops trashed ids from initial selected on mount', function (): void {
         'filename' => 'active',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/active.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -276,9 +276,9 @@ it('drops trashed ids from initial selected on mount', function (): void {
         'filename' => 'trashed',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/trashed.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
     $trashed->delete();
@@ -294,9 +294,9 @@ it('refuses to add a trashed item to selection via toggleSelection', function ()
         'filename' => 'trashed',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/trashed.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
     $trashed->delete();
@@ -334,9 +334,9 @@ it('dispatches selection events on insert', function (): void {
         'filename' => 'selected',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/selected.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 

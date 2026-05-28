@@ -11,9 +11,9 @@ function makeMedia(array $overrides = []): FilePickerMedia
         'filename' => 'fav-test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/fav-test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ], $overrides));
 }

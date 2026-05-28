@@ -4,6 +4,4 @@ parameters:
     level: 10
     paths:
         - src
-    scanFiles:
-        - stubs/PlankMediable.stub.php
     ignoreErrors:

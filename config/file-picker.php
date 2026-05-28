@@ -12,14 +12,16 @@ return [
     |
     | The driver determines how media is stored, queried, and managed.
     |
-    | Supported: "default", "plank", or any class implementing MediaDriverInterface.
+    | Supported: "plank" (default), or any class implementing MediaDriverInterface.
     |
-    | "default" — Uses the package's built-in model & migration. Zero external deps.
-    | "plank"   — Uses plank/laravel-mediable (must be installed separately).
+    | "plank" — Built on top of plank/laravel-mediable. Wraps Plank's Media model
+    |           with extra columns (folder, tags, favorites, alt, hash, etc.) via
+    |           an additive migration. Set 'driver' to the FQCN of a custom driver
+    |           class to use a different backend.
     |
     */
 
-    'driver' => env('FILE_PICKER_DRIVER', 'default'),
+    'driver' => env('FILE_PICKER_DRIVER', 'plank'),
 
     /*
     |--------------------------------------------------------------------------
@@ -33,15 +35,8 @@ return [
     */
 
     'drivers' => [
-        'default' => [
-            'model' => FilePickerMedia::class,
-            'disk' => env('FILE_PICKER_DISK', 'public'),
-            'directory' => env('FILE_PICKER_DIRECTORY', 'media'),
-            'visibility' => env('FILE_PICKER_VISIBILITY', 'public'),
-        ],
-
         'plank' => [
-            'model' => 'Plank\Mediable\Media',
+            'model' => FilePickerMedia::class,
             'disk' => env('FILE_PICKER_DISK', 'public'),
             'directory' => env('FILE_PICKER_DIRECTORY', 'media'),
             'visibility' => env('FILE_PICKER_VISIBILITY', 'public'),
