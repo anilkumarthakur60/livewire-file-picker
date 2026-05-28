@@ -51,9 +51,6 @@
         "pestphp/pest": "^3.0|^4.0"
     },
     "extra": {
-        "branch-alias": {
-            "dev-main": "1.x-dev"
-        },
         "laravel": {
             "providers": [
                 "Anil\\LivewireFilePicker\\Providers\\FilePickerProvider"
