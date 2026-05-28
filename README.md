@@ -643,18 +643,15 @@ php artisan file-picker:stats
 | `selectionLabel`     | string | Human-readable selection count |
 | `selectedCount`      | int    | Number of selected items       |
 
-## Migration from v1
+## Versioning
 
-If upgrading from v1.x:
+This package follows [Semantic Versioning](https://semver.org/). While we're in the `0.x` line the public API may change between minor releases — pin to a specific `0.x` range (e.g. `^0.1`) rather than across them.
 
-1. The composer package has been renamed from `anil/livewire-file-picker` to `anil/file-picker`. Update your `composer.json` require entry and run `composer update`.
-2. Update your composer.json to require `^2.0`
-3. The component name remains `file-picker`
-4. Events have been renamed:
-    - `imagesSelected` → `filesSelected`
-    - `file-picker-selected` remains the same — but its payload is now a single array (one parameter on the listener) rather than positional args. See [Livewire events](#livewire-events).
-5. Configuration file structure has changed — republish config
-6. The Livewire view's auto-open-on-click behaviour for the details panel was removed; on tablet/mobile the panel only opens via the new edit-icon button. No code change needed unless you published the views.
+```bash
+composer require anil/file-picker:^0.1
+```
+
+> **Note on `^0.1`:** Composer expands this to `>=0.1.0, <0.2.0`. When `0.2.0` lands you'll need to bump the constraint deliberately (which is the intended behaviour for pre-1.0 packages).
 
 ## Static Analysis
 
