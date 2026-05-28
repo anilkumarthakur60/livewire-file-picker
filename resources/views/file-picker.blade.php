@@ -501,7 +501,8 @@
                         @if ($currentTab === 'library')
                             <div class="fp-library-layout"
                                  x-data="{ detailsOpen: true }"
-                                 x-on:open-details.window="detailsOpen = true">
+                                 x-on:open-details.window="detailsOpen = true"
+                                 x-on:close-details.window="detailsOpen = false">
                                 <div class="fp-library-main"
                                      x-on:click="detailsOpen = true">
                                     <div class="fp-grid" wire:key="media-grid-{{ $renderTimestamp }}">

@@ -2134,6 +2134,95 @@
 }
 
 /* Tablet & below */
+/* -------------------------------------------------------------------
+   DETAIL SHEET (tablet + mobile)
+   Applies at ≤1024px so iPad-portrait users don't lose 40% of the
+   viewport to an inline sidebar. The sidebar becomes a right-side
+   sheet overlay with shadcn-style snappy easing.
+   ------------------------------------------------------------------- */
+@media (max-width: 1024px) {
+    .fp-library-layout {
+        position: relative;
+    }
+
+    .fp-library-main {
+        width: 100%;
+    }
+
+    .fp-library-sidebar {
+        position: absolute;
+        inset: 0 0 0 auto;
+        width: min(480px, 80vw);
+        max-height: none;
+        transform: translateX(100%);
+        transition: transform 250ms cubic-bezier(0.32, 0.72, 0, 1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), -8px 0 24px -8px rgba(0, 0, 0, 0.12);
+        border-left: 1px solid var(--fp-border);
+        border-top: none;
+        z-index: 10;
+        background: white;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        will-change: transform;
+    }
+
+    .fp-library-sidebar.fp-library-sidebar--open {
+        transform: translateX(0);
+    }
+
+    .fp-sidebar-close {
+        display: flex;
+    }
+
+    .fp-library-sidebar .fp-sidebar-header {
+        flex-shrink: 0;
+        margin: 0;
+        padding: 14px 18px;
+        background: white;
+        border-bottom: 1px solid var(--fp-border);
+    }
+
+    .fp-library-sidebar .fp-sidebar-body {
+        display: block;
+        flex: 1 1 auto;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        padding: 16px 18px;
+    }
+
+    .fp-library-sidebar .fp-sidebar-footer {
+        display: block;
+        flex-shrink: 0;
+        padding: 12px 18px;
+        background: white;
+        border-top: 1px solid var(--fp-border);
+    }
+
+    .fp-library-sidebar .fp-sidebar-empty {
+        padding: 24px 18px;
+    }
+
+    .fp-sidebar-backdrop {
+        display: block;
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 9;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 200ms cubic-bezier(0.32, 0.72, 0, 1);
+    }
+
+    .fp-sidebar-backdrop.fp-sidebar-backdrop--open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+}
+
 @media (max-width: 768px) {
     .fp-backdrop {
         padding: 8px;
@@ -2225,87 +2314,9 @@
         align-items: flex-start;
     }
 
-    /* Layout becomes a relative container so the sidebar can be an overlay drawer */
-    .fp-library-layout {
-        position: relative;
-    }
-
     .fp-library-main {
         padding: 12px 16px;
         width: 100%;
-    }
-
-    .fp-library-sidebar {
-        position: absolute;
-        inset: 0 0 0 auto;
-        width: min(100%, 420px);
-        max-height: none;
-        transform: translateX(100%);
-        transition: transform 0.28s var(--fp-ease-spring);
-        box-shadow: -10px 0 28px -10px rgba(0, 0, 0, 0.18);
-        border-left: 1px solid var(--fp-border);
-        border-top: none;
-        z-index: 10;
-        background: white;
-        padding: 0;
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-
-    .fp-library-sidebar.fp-library-sidebar--open {
-        transform: translateX(0);
-    }
-
-    .fp-sidebar-close {
-        display: flex;
-    }
-
-    /* Drawer 3-section layout: sticky header, scrollable body, sticky footer */
-    .fp-library-sidebar .fp-sidebar-header {
-        flex-shrink: 0;
-        margin: 0;
-        padding: 14px 18px;
-        background: white;
-    }
-
-    .fp-library-sidebar .fp-sidebar-body {
-        display: block;
-        flex: 1 1 auto;
-        min-height: 0;
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior: contain;
-        padding: 16px 18px;
-    }
-
-    .fp-library-sidebar .fp-sidebar-footer {
-        display: block;
-        flex-shrink: 0;
-        padding: 12px 18px;
-        background: white;
-        border-top: 1px solid var(--fp-border);
-    }
-
-    /* Empty state still gets a bit of padding when drawer happens to render it */
-    .fp-library-sidebar .fp-sidebar-empty {
-        padding: 24px 18px;
-    }
-
-    .fp-sidebar-backdrop {
-        display: block;
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.42);
-        z-index: 9;
-        opacity: 0;
-        pointer-events: none;
-        transition: opacity 0.2s var(--fp-ease);
-    }
-
-    .fp-sidebar-backdrop.fp-sidebar-backdrop--open {
-        opacity: 1;
-        pointer-events: auto;
     }
 
     .fp-sidebar-thumb {

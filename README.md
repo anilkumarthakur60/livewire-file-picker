@@ -4,48 +4,33 @@ A WordPress-like file picker component for Laravel Livewire. Supports images, vi
 
 ## Features
 
-- 📁 **All File Types** - Images, videos, audio, documents, spreadsheets, presentations, archives, and code files
-- 🎨 **Beautiful UI** - Modern, clean interface inspired by WordPress media library
-- 🔍 **Search & Filter** - Quick search and filter by file type, folder, tag, or favorite
-- 📤 **Drag & Drop Upload** - Easy file uploads with drag and drop support
-- ✅ **Single/Multiple Selection** - Choose one or many files
-- 🗑️ **Trash & Restore** - Soft-delete with a recoverable trash bin
-- 🔁 **Replace File** - Update an existing media record's file in place
-- 🪪 **Hash & Duplicate Detection** - SHA-256 dedup with `reuse`, `reject`, or `allow` strategies
-- ⭐ **Favorites** - Star important items
-- 🏷️ **Tags** - Tag media for richer organization and filtering
-- 📂 **Folders** - Group media into folders with bulk move
-- 👤 **Ownership Tracking** - Auto-record `user_id` and optionally scope library per user
-- 📊 **Storage Quotas** - Global or per-user storage caps
-- 📈 **Statistics API** - Aggregate counts/sizes/by-type via `FilePicker::getStats()`
-- 📥 **Force Download + ZIP Bulk Download** - Per-file or multi-file zip downloads
-- 🛠️ **Console Commands** - `prune-trash`, `prune-orphans`, `stats`
-- 📱 **Responsive** - Works great on all devices
-- ⚙️ **Highly Configurable** - Extensive configuration options + feature toggles
-- 🎯 **Form Integration** - Works with Livewire and traditional forms
-- ♿ **Accessible** - Proper keyboard navigation and screen reader support
-- **All File Types** — Images, videos, audio, documents, spreadsheets, presentations, archives, and code files
-- **Beautiful UI** — Modern, clean interface inspired by the WordPress media library
-- **Search & Filter** — Quick search and filter by file type with custom filter support
-- **Drag & Drop Upload** — Easy file uploads with drag-and-drop and paste-to-upload support
-- **Single/Multiple Selection** — Choose one or many files with configurable limits
-- **Bulk Delete** — Select and delete multiple files at once
-- **Alt Text Editing** — Edit alt text for media items inline
-- **Keyboard Navigation** — Full keyboard support for accessibility
-- **Responsive** — Works on all screen sizes
-- **Highly Configurable** — Extensive config, feature toggles, and theme colors
-- **Form Integration** — Works with Livewire and traditional HTML forms
-- **Custom Drivers** — Built-in driver, plank/laravel-mediable driver, or bring your own
-- **Authorization** — Plug in your own authorization logic per action
-- **Custom Filters** — Add your own filter controls to the media library toolbar
+- 📁 **All File Types** — Images, videos, audio, documents, spreadsheets, presentations, archives, and code files
+- 🎨 **Beautiful UI** — Modern, clean interface inspired by WordPress media library, with a responsive Sheet-style detail panel on tablet/mobile
+- 🔍 **Search & Filter** — Quick search and filter by file type, folder, tag, or favorite
+- 📤 **Drag & Drop + Paste** — Drag-drop files in, or paste from clipboard
+- ✅ **Single / Multiple Selection** — Configurable max-files
+- 🗑️ **Trash & Restore** — Soft-delete with recoverable trash + retention-based pruning
+- 🔁 **Replace File** — Update an existing media record's file in place
+- 🪪 **Hash & Duplicate Detection** — SHA-256 dedup with `reuse`, `reject`, or `allow` strategies
+- ⭐ **Favorites** — Star important items
+- 🏷️ **Tags** — Free-form labels for richer organization
+- 📂 **Folders** — Group media into folders with single & bulk move
+- ✏️ **Inline Editing** — Rename and edit alt text without leaving the picker
+- 👤 **Ownership Tracking** — Auto-record `user_id`, optionally scope library per user
+- 📊 **Storage Quotas** — Global and per-user storage caps
+- 📈 **Statistics API** — Aggregate counts / sizes / by-type via `FilePicker::getStats()`
+- 📥 **Downloads** — Force-download single files or bulk download as ZIP
+- 🛠️ **Console Commands** — `file-picker:prune-trash`, `file-picker:prune-orphans`, `file-picker:stats`
+- ⚙️ **Highly Configurable** — Feature toggles, theme colors, custom drivers, custom authorization, custom filters
+- 🎯 **Form Integration** — Works with Livewire components and traditional HTML forms
+- ♿ **Accessible** — Keyboard navigation, focus management, Esc-to-close
 
 ## Requirements
 
-- PHP 8.2+
-- Laravel 11.x or 12.x
+- PHP 8.2+ (also tested on 8.3 / 8.4)
+- Laravel 11.x, 12.x, or 13.x
 - Livewire 3.x or 4.x
-
-> **Optional:** [plank/laravel-mediable](https://github.com/plank/laravel-mediable) ^6.0 — only required when using the `plank` driver.
+- [plank/laravel-mediable](https://github.com/plank/laravel-mediable) ^6.0 — installed automatically
 
 ## Installation
 
@@ -63,7 +48,7 @@ php artisan file-picker:install
 
 This single command will:
 - Publish `config/file-picker.php`
-- Publish and run the package migrations (default driver only)
+- Run the package migration — an additive migration that adds the package's columns (`folder`, `tags`, `is_favorite`, `hash`, etc.) to Plank's `media` table
 
 That's it. Assets (CSS/JS) are served automatically via a built-in route — no need to publish them.
 
@@ -268,33 +253,23 @@ public function onFilePickerSelected(array $selected, string $inputName, string 
 
 ## Drivers
 
-### Default driver (built-in)
+### Plank driver (default)
 
-Zero external dependencies. Uses the package's own `FilePickerMedia` model and migration.
+The package is built on top of [plank/laravel-mediable](https://github.com/plank/laravel-mediable) — installed automatically as a hard dependency. The bundled `FilePickerMedia` model extends Plank's `Media` model and the install migration adds the extra columns we need (`folder`, `tags`, `is_favorite`, `hash`, `width`, `height`, `duration`, `user_id`, `download_count`, `custom_properties`, `deleted_at`) to Plank's `media` table.
+
+Defaults:
 
 ```env
-FILE_PICKER_DRIVER=default
+FILE_PICKER_DRIVER=plank
 FILE_PICKER_DISK=public
 FILE_PICKER_DIRECTORY=media
 ```
 
-### Plank driver (laravel-mediable)
-
-Requires [plank/laravel-mediable](https://github.com/plank/laravel-mediable) ^6.0.
-
-```bash
-composer require plank/laravel-mediable
-php artisan vendor:publish --provider="Plank\Mediable\MediableServiceProvider"
-php artisan migrate
-```
-
-```env
-FILE_PICKER_DRIVER=plank
-```
+> **Using a non-public disk?** Plank's `mediable.allowed_disks` config defaults to `['public']` only. To use `s3` or another disk, publish Plank's config (`php artisan vendor:publish --tag=mediable-config`) and add your disk to `allowed_disks`.
 
 ### Custom driver
 
-Implement `Anil\LivewireFilePicker\Contracts\MediaDriverInterface` and register it:
+Implement `Anil\LivewireFilePicker\Contracts\MediaDriverInterface` (or extend `Anil\LivewireFilePicker\Drivers\AbstractDriver`) and register the FQCN as the driver:
 
 ```php
 // config/file-picker.php
@@ -408,17 +383,11 @@ php artisan vendor:publish --tag=file-picker-config
 ### Driver
 
 ```php
-'driver' => env('FILE_PICKER_DRIVER', 'default'), // 'default' | 'plank' | CustomDriver::class
+'driver' => env('FILE_PICKER_DRIVER', 'plank'), // 'plank' | CustomDriver::class
 
 'drivers' => [
-    'default' => [
-        'model'      => FilePickerMedia::class,
-        'disk'       => env('FILE_PICKER_DISK', 'public'),
-        'directory'  => env('FILE_PICKER_DIRECTORY', 'media'),
-        'visibility' => env('FILE_PICKER_VISIBILITY', 'public'),
-    ],
     'plank' => [
-        'model'      => 'Plank\Mediable\Media',
+        'model'      => FilePickerMedia::class, // extends Plank\Mediable\Media
         'disk'       => env('FILE_PICKER_DISK', 'public'),
         'directory'  => env('FILE_PICKER_DIRECTORY', 'media'),
         'visibility' => env('FILE_PICKER_VISIBILITY', 'public'),
