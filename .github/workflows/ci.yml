@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [*]
+    branches: [ * ]
   pull_request:
-    branches: [*]
+    branches: [ * ]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,8 +16,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ['8.2', '8.3', '8.4', '8.5']
-        dependency-version: [prefer-stable, prefer-lowest]
+        php: [ '8.2', '8.3', '8.4', '8.5' ]
+        dependency-version: [ prefer-stable, prefer-lowest ]
     name: P${{ matrix.php }} - ${{ matrix.dependency-version }}
 
     steps:
