@@ -180,7 +180,8 @@ final class PlankMediaDriver extends AbstractDriver
                 ->fromSource($file);
 
             if (($options['keep_filename'] ?? false) === true) {
-                $uploader->useFilename((string) $existing->getAttribute('filename'));
+                $existingFilename = $existing->getAttribute('filename');
+                $uploader->useFilename(is_string($existingFilename) ? $existingFilename : '');
             } else {
                 $originalName = $file->getClientOriginalName();
                 $uploader->useFilename(pathinfo($originalName, PATHINFO_FILENAME));
@@ -256,13 +257,7 @@ final class PlankMediaDriver extends AbstractDriver
 
     protected function performDelete(Model $media): void
     {
-        if (method_exists($media, 'forceDelete')) {
-            $media->forceDelete();
-
-            return;
-        }
-
-        $media->delete();
+        $media->forceDelete();
     }
 
     private function uploader(): MediaUploader
