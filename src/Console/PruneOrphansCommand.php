@@ -26,8 +26,7 @@ final class PruneOrphansCommand extends Command
 
         $driver->queryWithTrashed()->lazyById()->each(function (Model $media) use ($driver, $dryRun, &$orphaned): void {
             $disk = $this->resolveDisk($media);
-            $rawPath = $media->getAttribute('path');
-            $path = is_string($rawPath) ? $rawPath : '';
+            $path = $this->resolvePath($media);
 
             if ($path === '') {
                 return;
@@ -70,8 +69,29 @@ final class PruneOrphansCommand extends Command
         }
 
         /** @var string $configured */
-        $configured = config('file-picker.drivers.default.disk', 'public');
+        $configured = config('file-picker.drivers.plank.disk', 'public');
 
         return $configured;
+    }
+
+    private function resolvePath(Model $media): string
+    {
+        if (method_exists($media, 'getDiskPath')) {
+            $path = $media->getDiskPath();
+
+            return is_string($path) ? $path : '';
+        }
+
+        $directory = $media->getAttribute('directory');
+        $filename = $media->getAttribute('filename');
+        $extension = $media->getAttribute('extension');
+
+        if (! is_string($directory) || ! is_string($filename) || $filename === '') {
+            return '';
+        }
+
+        $ext = is_string($extension) && $extension !== '' ? '.'.$extension : '';
+
+        return ltrim(rtrim($directory, '/').'/'.$filename.$ext, '/');
     }
 }

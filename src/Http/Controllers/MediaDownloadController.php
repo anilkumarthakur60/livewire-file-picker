@@ -144,16 +144,30 @@ final class MediaDownloadController
         }
 
         /** @var string $configured */
-        $configured = config('file-picker.drivers.default.disk', 'public');
+        $configured = config('file-picker.drivers.plank.disk', 'public');
 
         return $configured;
     }
 
     private function getPath(Model $media): string
     {
-        $path = $media->getAttribute('path');
+        if (method_exists($media, 'getDiskPath')) {
+            $path = $media->getDiskPath();
 
-        return is_string($path) ? $path : '';
+            return is_string($path) ? $path : '';
+        }
+
+        $directory = $media->getAttribute('directory');
+        $filename = $media->getAttribute('filename');
+        $extension = $media->getAttribute('extension');
+
+        if (! is_string($directory) || ! is_string($filename) || $filename === '') {
+            return '';
+        }
+
+        $ext = is_string($extension) && $extension !== '' ? '.'.$extension : '';
+
+        return ltrim(rtrim($directory, '/').'/'.$filename.$ext, '/');
     }
 
     private function getDownloadFilename(Model $media): string
