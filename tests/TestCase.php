@@ -44,6 +44,7 @@ abstract class TestCase extends Orchestra
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
+            'foreign_key_constraints' => false,
         ]);
 
         $app['config']->set('file-picker.driver', 'plank');
