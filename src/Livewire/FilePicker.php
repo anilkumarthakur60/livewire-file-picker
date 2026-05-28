@@ -805,6 +805,37 @@ class FilePicker extends Component
         }
     }
 
+    public function viewDetails(int $mediaId): void
+    {
+        if ($this->viewMode === 'trash') {
+            $this->activeTrashId = $mediaId;
+            $this->renderTimestamp = time();
+
+            return;
+        }
+
+        $this->normalizeSelected();
+
+        $this->selected = array_values(array_diff($this->selected, [$mediaId]));
+
+        if (! $this->multiple) {
+            $this->selected = [$mediaId];
+        } else {
+            $this->selected[] = $mediaId;
+
+            if (count($this->selected) > $this->maxFiles) {
+                $this->selected = array_slice($this->selected, -$this->maxFiles);
+            }
+        }
+
+        $this->renderTimestamp = time();
+        $this->dispatch('selection-updated', selected: $this->selected);
+
+        if (! $this->showModal) {
+            $this->dispatchSelectionToParent();
+        }
+    }
+
     public function isItemActiveInView(int $mediaId): bool
     {
         if ($this->viewMode === 'trash') {

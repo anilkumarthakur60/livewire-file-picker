@@ -532,11 +532,10 @@
                              ======================================================== --}}
                         @if ($currentTab === 'library')
                             <div class="fp-library-layout"
-                                 x-data="{ detailsOpen: true }"
+                                 x-data="{ detailsOpen: false }"
                                  x-on:open-details.window="detailsOpen = true"
                                  x-on:close-details.window="detailsOpen = false">
-                                <div class="fp-library-main"
-                                     x-on:click="detailsOpen = true">
+                                <div class="fp-library-main">
                                     <div class="fp-grid" wire:key="media-grid-{{ $renderTimestamp }}">
                                         @forelse ($mediaItems as $item)
                                             <div
@@ -564,6 +563,19 @@
                                                         <span aria-hidden="true">{{ ($item['is_favorite'] ?? false) ? '★' : '☆' }}</span>
                                                     </button>
                                                 @endif
+
+                                                {{-- Edit / Details (tablet & mobile only) --}}
+                                                <button type="button"
+                                                        wire:click.stop="viewDetails({{ $item['id'] }})"
+                                                        x-on:click="$dispatch('open-details')"
+                                                        class="fp-item-edit"
+                                                        title="{{ config('file-picker.texts.view_details', 'View details') }}"
+                                                        aria-label="{{ config('file-picker.texts.view_details', 'View details') }}">
+                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                </button>
 
                                                 {{-- Thumbnail / File Icon --}}
                                                 <div class="fp-thumbnail">

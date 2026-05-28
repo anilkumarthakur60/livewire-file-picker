@@ -322,7 +322,7 @@ return [
         'delete_button' => 'Move to Trash',
         'force_delete_button' => 'Delete forever',
         'restore_button' => 'Restore',
-        'bulk_delete_button' => 'Move selected to trash',
+        'bulk_delete_button' => 'Trash',
         'edit_alt_placeholder' => 'Enter alt text...',
         'edit_alt_help' => 'Press Enter to save',
         'rename_placeholder' => 'Enter new filename...',
