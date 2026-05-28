@@ -12,9 +12,9 @@ it('finds media by stored hash', function (): void {
         'filename' => 'hashed',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/hashed.txt',
         'extension' => 'txt',
         'mime_type' => 'text/plain',
+        'aggregate_type' => 'document',
         'size' => 14,
         'hash' => $hash,
     ]);
@@ -38,9 +38,9 @@ it('persists hash column on the model', function (): void {
         'filename' => 'with-hash',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/with-hash.txt',
         'extension' => 'txt',
         'mime_type' => 'text/plain',
+        'aggregate_type' => 'document',
         'size' => 10,
         'hash' => str_repeat('a', 64),
     ]);

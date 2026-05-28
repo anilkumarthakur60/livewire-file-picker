@@ -6,42 +6,36 @@ namespace Anil\LivewireFilePicker\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Filesystem\FilesystemAdapter;
-use Illuminate\Support\Facades\Storage;
+use Plank\Mediable\Media;
 
 /**
  * @property int $id
- * @property string $filename
- * @property string $disk
- * @property string $directory
- * @property string $path
- * @property string $extension
- * @property string $mime_type
- * @property int $size
- * @property string|null $alt
- * @property int|null $width
- * @property int|null $height
- * @property int|null $duration
- * @property string|null $hash
+ * @property string|null $disk
+ * @property string|null $directory
+ * @property string|null $filename
+ * @property string|null $extension
+ * @property string|null $mime_type
+ * @property string|null $aggregate_type
+ * @property int|null $size
+ * @property string $alt
  * @property string|null $folder
  * @property array<int, string>|null $tags
  * @property bool $is_favorite
+ * @property string|null $hash
+ * @property int|null $width
+ * @property int|null $height
+ * @property int|null $duration
  * @property int|null $user_id
  * @property int $download_count
  * @property array<string, mixed>|null $custom_properties
  * @property Carbon $created_at
  * @property Carbon $updated_at
  * @property Carbon|null $deleted_at
- * @property-read string $aggregate_type
  */
-final class FilePickerMedia extends Model
+class FilePickerMedia extends Media
 {
     use SoftDeletes;
-
-    /** @var string */
-    protected $table = 'file_picker_media';
 
     /** @var list<string> */
     protected $guarded = ['id'];
@@ -62,40 +56,6 @@ final class FilePickerMedia extends Model
             'tags' => 'array',
             'custom_properties' => 'array',
         ];
-    }
-
-    public function getUrl(): string
-    {
-        /** @var string $disk */
-        $disk = $this->disk ?? config('file-picker.drivers.default.disk', 'public');
-
-        /** @var FilesystemAdapter $diskInstance */
-        $diskInstance = Storage::disk($disk);
-
-        return $diskInstance->url($this->path);
-    }
-
-    public function getFullPath(): string
-    {
-        /** @var string $disk */
-        $disk = $this->disk ?? config('file-picker.drivers.default.disk', 'public');
-
-        /** @var FilesystemAdapter $diskInstance */
-        $diskInstance = Storage::disk($disk);
-
-        return $diskInstance->path($this->path);
-    }
-
-    public function getAggregateTypeAttribute(): string
-    {
-        $mime = $this->mime_type ?? '';
-
-        return match (true) {
-            str_starts_with($mime, 'image/') => 'image',
-            str_starts_with($mime, 'video/') => 'video',
-            str_starts_with($mime, 'audio/') => 'audio',
-            default => 'document',
-        };
     }
 
     /**

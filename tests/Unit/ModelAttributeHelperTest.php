@@ -46,15 +46,15 @@ it('returns null for missing nullable int', function (): void {
 
 it('extracts nullable string attribute', function (): void {
     $model = new FilePickerMedia;
-    $model->setAttribute('alt', 'test alt');
+    $model->setAttribute('hash', 'test hash');
 
-    expect(ModelAttributeHelper::nullableString($model, 'alt'))->toBe('test alt');
+    expect(ModelAttributeHelper::nullableString($model, 'hash'))->toBe('test hash');
 });
 
 it('returns null for missing nullable string', function (): void {
     $model = new FilePickerMedia;
 
-    expect(ModelAttributeHelper::nullableString($model, 'alt'))->toBeNull();
+    expect(ModelAttributeHelper::nullableString($model, 'hash'))->toBeNull();
 });
 
 it('handles numeric string for int', function (): void {

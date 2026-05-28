@@ -48,11 +48,44 @@ document.addEventListener('livewire:init', () => {
         const backdrop = document.querySelector('.fp-backdrop');
         if (!backdrop) return;
 
-        // Escape to close modal
+        // Escape: close the detail sheet first if it's open on a tablet/mobile
+        // viewport; otherwise close the whole modal.
         if (e.key === 'Escape') {
+            const sheetOpen = document.querySelector('.fp-library-sidebar.fp-library-sidebar--open');
+            if (sheetOpen && window.innerWidth <= 1024) {
+                e.preventDefault();
+                window.dispatchEvent(new CustomEvent('close-details'));
+                return;
+            }
+
             e.preventDefault();
             Livewire.dispatch('closeModal');
         }
+    });
+
+    // Surface browser-side upload errors (PHP upload_max_filesize, 413, network)
+    // back into the file picker toast.
+    document.addEventListener('livewire-upload-error', (e) => {
+        const input = e.target;
+        const root = input?.closest?.('[wire\\:id]');
+        if (!root || !input?.closest?.('.fp-upload-area')) return;
+
+        const id = root.getAttribute('wire:id');
+        const component = window.Livewire?.find?.(id);
+        if (!component) return;
+
+        const detail = e.detail || {};
+        const status = detail?.status ?? detail?.statusCode;
+        let message = 'Upload failed. The file may be too large or the connection was interrupted.';
+        if (status === 413) {
+            message = 'Upload failed: the file is larger than the server allows.';
+        } else if (status === 422) {
+            message = 'Upload rejected: the file did not pass validation.';
+        } else if (typeof status === 'number') {
+            message = `Upload failed (HTTP ${status}). Please try again.`;
+        }
+
+        component.call('setUploadError', message);
     });
 
     // Paste-to-upload support

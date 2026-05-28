@@ -10,9 +10,9 @@ it('returns expected stats keys', function (): void {
         'filename' => 's1',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/s1.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1000,
     ]);
 
@@ -20,9 +20,9 @@ it('returns expected stats keys', function (): void {
         'filename' => 's2',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/s2.pdf',
         'extension' => 'pdf',
         'mime_type' => 'application/pdf',
+        'aggregate_type' => 'pdf',
         'size' => 2500,
     ]);
 
@@ -42,9 +42,9 @@ it('counts trashed in stats', function (): void {
         'filename' => 't1',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/t1.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1000,
     ]);
 

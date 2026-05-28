@@ -87,18 +87,6 @@ final class InstallCommand extends Command
             return;
         }
 
-        /** @var string $driver */
-        $driver = config('file-picker.driver', 'default');
-
-        if ($driver !== 'default') {
-            $this->components->twoColumnDetail(
-                'Migrations',
-                "<fg=yellow>SKIPPED</> (driver is '{$driver}', migrations only needed for 'default' driver)"
-            );
-
-            return;
-        }
-
         $this->components->task('Running migrations', function (): void {
             $this->callSilently('migrate');
         });

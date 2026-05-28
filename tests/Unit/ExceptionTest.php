@@ -14,13 +14,6 @@ it('creates driver not found exception', function (): void {
     expect($exception->getMessage())->toContain('invalid');
 });
 
-it('creates plank not installed exception', function (): void {
-    $exception = DriverNotFoundException::plankNotInstalled();
-
-    expect($exception)->toBeInstanceOf(FilePickerException::class);
-    expect($exception->getMessage())->toContain('plank/laravel-mediable');
-});
-
 it('creates media not found exception', function (): void {
     $exception = MediaNotFoundException::withId(42);
 

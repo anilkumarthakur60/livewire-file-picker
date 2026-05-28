@@ -1,5 +1,5 @@
 {
-    "name": "anil/livewire-file-picker",
+    "name": "anil/file-picker",
     "description": "A WordPress-like file picker component for Laravel Livewire. Supports images, videos, audio, documents and all file types with a beautiful modal interface.",
     "type": "library",
     "license": "MIT",
@@ -41,10 +41,8 @@
         "illuminate/contracts": "^11.0|^12.0|^13.0",
         "illuminate/support": "^11.0|^12.0|^13.0",
         "illuminate/view": "^11.0|^12.0|^13.0",
-        "livewire/livewire": "^3.0|^4.0"
-    },
-    "suggest": {
-        "plank/laravel-mediable": "Required when using the 'plank' driver (^6.0)"
+        "livewire/livewire": "^3.0|^4.0",
+        "plank/laravel-mediable": "^6.0"
     },
     "require-dev": {
         "larastan/larastan": "^3.0",
@@ -54,7 +52,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev": "main"
+            "dev-main": "1.x-dev"
         },
         "laravel": {
             "providers": [

@@ -11,19 +11,16 @@ it('soft-deletes media via delete', function (): void {
         'filename' => 'soft-delete-test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/soft-delete-test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
     $driver = app(MediaDriverInterface::class);
     $driver->delete($media->id);
 
-    // Standard query should not find it
     expect($driver->findById($media->id))->toBeNull();
-
-    // But it should still exist in trashed query
     expect($driver->queryOnlyTrashed()->where('id', $media->id)->exists())->toBeTrue();
 });
 
@@ -32,9 +29,9 @@ it('restores trashed media', function (): void {
         'filename' => 'restore-test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/restore-test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 
@@ -55,9 +52,9 @@ it('force-deletes a trashed item', function (): void {
         'filename' => 'force-test',
         'disk' => 'public',
         'directory' => 'media',
-        'path' => 'media/force-test.jpg',
         'extension' => 'jpg',
         'mime_type' => 'image/jpeg',
+        'aggregate_type' => 'image',
         'size' => 1024,
     ]);
 

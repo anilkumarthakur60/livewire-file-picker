@@ -323,6 +323,38 @@
                                     </div>
                                 @endif
 
+                                {{-- Per-file validation errors --}}
+                                @php
+                                    $uploadFieldErrors = collect($errors->getMessages())
+                                        ->filter(fn ($_, $key) => str_starts_with($key, 'uploadedFiles.'));
+                                @endphp
+                                @if ($uploadFieldErrors->isNotEmpty())
+                                    <div class="fp-upload-validation">
+                                        <div class="fp-upload-validation-title">
+                                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                            </svg>
+                                            <span>{{ $uploadFieldErrors->count() === 1 ? '1 file has an error' : $uploadFieldErrors->count().' files have errors' }}</span>
+                                        </div>
+                                        <ul class="fp-upload-validation-list">
+                                            @foreach ($uploadFieldErrors as $key => $messages)
+                                                @php
+                                                    $idx = (int) str_replace('uploadedFiles.', '', (string) $key);
+                                                    $name = $uploadedFiles[$idx] ?? null;
+                                                    $label = $name ? $name->getClientOriginalName() : 'File '.($idx + 1);
+                                                @endphp
+                                                @foreach ($messages as $msg)
+                                                    <li>
+                                                        <strong>{{ $label }}:</strong>
+                                                        <span>{{ $msg }}</span>
+                                                    </li>
+                                                @endforeach
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                @endif
+
                                 {{-- Scrollable body: dropzone + pending files --}}
                                 <div class="fp-upload-body">
                                     @if (empty($uploadedFiles))
@@ -500,10 +532,10 @@
                              ======================================================== --}}
                         @if ($currentTab === 'library')
                             <div class="fp-library-layout"
-                                 x-data="{ detailsOpen: true }"
-                                 x-on:open-details.window="detailsOpen = true">
-                                <div class="fp-library-main"
-                                     x-on:click="detailsOpen = true">
+                                 x-data="{ detailsOpen: false }"
+                                 x-on:open-details.window="detailsOpen = true"
+                                 x-on:close-details.window="detailsOpen = false">
+                                <div class="fp-library-main">
                                     <div class="fp-grid" wire:key="media-grid-{{ $renderTimestamp }}">
                                         @forelse ($mediaItems as $item)
                                             <div
@@ -531,6 +563,19 @@
                                                         <span aria-hidden="true">{{ ($item['is_favorite'] ?? false) ? '★' : '☆' }}</span>
                                                     </button>
                                                 @endif
+
+                                                {{-- Edit / Details (tablet & mobile only) --}}
+                                                <button type="button"
+                                                        wire:click.stop="viewDetails({{ $item['id'] }})"
+                                                        x-on:click="$dispatch('open-details')"
+                                                        class="fp-item-edit"
+                                                        title="{{ config('file-picker.texts.view_details', 'View details') }}"
+                                                        aria-label="{{ config('file-picker.texts.view_details', 'View details') }}">
+                                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                    </svg>
+                                                </button>
 
                                                 {{-- Thumbnail / File Icon --}}
                                                 <div class="fp-thumbnail">
