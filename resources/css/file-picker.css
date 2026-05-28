@@ -1412,12 +1412,12 @@
     display: none;
     position: absolute;
     top: 8px;
-    right: 8px;
+    left: 40px;
     z-index: 2;
     align-items: center;
     justify-content: center;
-    width: 30px;
-    height: 30px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.92);
@@ -2200,13 +2200,17 @@
 
     .fp-item-select,
     .fp-item-favorite {
-        width: 30px;
-        height: 30px;
+        width: 24px;
+        height: 24px;
     }
 
     .fp-item-favorite {
         font-size: 16px;
-        left: 46px; /* keep clearance from selection circle */
+        left: 84px; /* clear the larger selection circle + edit button */
+    }
+
+    .fp-item-edit {
+        left: 46px; /* sit right after the larger selection circle */
     }
 }
 
@@ -2228,6 +2232,10 @@
 
     .fp-item-edit {
         display: flex;
+    }
+
+    .fp-item-favorite {
+        left: 78px; /* sit after the edit button */
     }
 
     .fp-library-sidebar {
