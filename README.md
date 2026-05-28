@@ -8,6 +8,7 @@ A WordPress-like file picker component for Laravel Livewire. Supports images, vi
 - 🎨 **Beautiful UI** — Modern, clean interface inspired by WordPress media library, with a responsive Sheet-style detail panel on tablet/mobile
 - 🔍 **Search & Filter** — Quick search and filter by file type, folder, tag, or favorite
 - 📤 **Drag & Drop + Paste** — Drag-drop files in, or paste from clipboard
+- 🚨 **Upload Error Reporting** — Validation errors render per-file, browser-side failures (413 / network) surface in the same toast
 - ✅ **Single / Multiple Selection** — Configurable max-files
 - 🗑️ **Trash & Restore** — Soft-delete with recoverable trash + retention-based pruning
 - 🔁 **Replace File** — Update an existing media record's file in place
@@ -118,9 +119,10 @@ class PostForm extends Component
 {
     public array $selectedMedia = [];
 
-    #[On('file-picker-selected')]
-    public function handleFilePickerSelected(array $selected, string $inputName): void
+    #[On('filesSelected')]
+    public function handleFilesSelected(array $selected, string $inputName): void
     {
+        // $selected is an array of media IDs
         $this->selectedMedia = $selected;
     }
 
@@ -239,17 +241,67 @@ window.addEventListener('file-picker:selected', (event) => {
 
 Each item in `selected` is an object with: `id`, `url`, `filename`, `size`, `extension`, `file_type`, `alt`, `created_at`.
 
-### Livewire event
+### Livewire events
 
-The component dispatches `file-picker-selected` which you can listen for in a parent Livewire component:
+Two Livewire events fire every time the selection changes. Pick the one that fits your handler shape:
+
+**`filesSelected`** — named arguments, easiest for typed signatures:
+
+```php
+#[On('filesSelected')]
+public function onFilesSelected(array $selected, string $inputName): void
+{
+    // $selected is an array of media IDs (int)
+    // $inputName is the picker's `input-name` prop (route by it if you have multiple pickers on one page)
+    $this->selectedIds = $selected;
+}
+```
+
+**`file-picker-selected`** — single array payload with the full picker context (used by the bundled JS callback support):
 
 ```php
 #[On('file-picker-selected')]
-public function onFilePickerSelected(array $selected, string $inputName, string $inputId): void
+public function onFilePickerSelected(array $payload): void
 {
-    $this->selectedIds = array_column($selected, 'id');
+    // $payload keys: selected, inputName, inputId, formId, multiple, autoSubmit, callbackFunction
+    $this->selectedIds = $payload['selected'];
 }
 ```
+
+> If you have several pickers on the same page, switch on `$inputName` (or `$payload['inputName']`) to route the selection to the right property.
+
+## Upload Errors
+
+Upload problems are surfaced to the UI on three levels:
+
+1. **Server-side validation** (size, mime type) — `uploadFiles()` runs the configured `mimes` / `max` rules and any failures are rendered:
+    - as a toast at the top of the upload tab (`uploadStatus = 'error'`), and
+    - as a per-file list (`{original_filename}: {message}`) below the toast.
+2. **Per-file driver failures during processing** — `DuplicateMediaException`, `StorageQuotaExceededException`, `UploadFailedException`, and any other `Throwable` thrown by the driver are caught and aggregated into the same toast (e.g. *"2 uploaded, 1 failed"*).
+3. **Browser-side failures** — the bundled JS listens for `livewire-upload-error` on the picker's file input and forwards the HTTP status to the component via `setUploadError(string $message)`. Common cases are mapped automatically:
+    - `413` → *"the file is larger than the server allows"*
+    - `422` → *"the file did not pass validation"*
+    - other status codes → generic *"Upload failed (HTTP …)"*
+
+Error toasts are sticky — they don't auto-clear like success messages do. The user dismisses them with the `×` button (or any new upload action resets the state).
+
+If you want to push your own error into the toast from a parent component or hook, call `setUploadError`:
+
+```php
+$this->dispatch('refresh-file-picker'); // example
+// or, from inside your custom driver / extension:
+$this->setUploadError('Quota exceeded — contact your administrator.');
+```
+
+## Tablet & Mobile
+
+The library tab uses a side-by-side layout on desktop (≥1025px) with the **Attachment Details** panel always visible. On tablet/mobile (≤1024px), the panel becomes a right-side sheet that's collapsed by default — tapping an item just selects it.
+
+To open the details sheet on touch devices, an **edit icon** appears on each grid item (top-left, right after the selection checkbox). Tapping it:
+- promotes the item to the active selection (without toggling existing selections off),
+- dispatches `open-details`, which slides the sheet in.
+
+The icon is hidden on desktop where the sidebar is always inline. You can rename the button via the `texts.view_details` config key (or the published lang file).
 
 ## Drivers
 
@@ -496,6 +548,9 @@ php artisan vendor:publish --tag=file-picker-lang
     'no_items'           => 'No media found',
     'insert_button'      => 'Insert Selected',
     'delete_confirm'     => 'Are you sure you want to delete this file?',
+    'view_details'       => 'View details',     // label for the tablet/mobile edit icon
+    'sidebar_title'      => 'Attachment Details',
+    'close_details'      => 'Close details',
     // ... see config/file-picker.php for the full list
 ],
 ```
@@ -529,9 +584,11 @@ Views will be published to `resources/views/vendor/file-picker/`.
 | `openModal()` / `closeModal()`  | Open / close the modal                              |
 | `setViewMode('library'\|'trash')` | Switch between active library and trash             |
 | `toggleSelection($id)`          | Toggle selection of a media item                    |
+| `viewDetails($id)`              | Promote item to active and open the details panel (used by the tablet/mobile edit icon) |
 | `clearSelection()`              | Clear all selected items                            |
 | `insertSelected()`              | Confirm selection and close modal                   |
 | `uploadFiles()`                 | Upload pending files                                |
+| `setUploadError($message)`      | Push an error message into the upload toast (also called from the JS upload-error hook) |
 | `deleteMedia($id)`              | Soft-delete a media item (move to trash)            |
 | `restoreMedia($id)`             | Restore from trash                                  |
 | `forceDeleteMedia($id)`         | Permanently delete (and remove file from disk)      |
@@ -590,12 +647,14 @@ php artisan file-picker:stats
 
 If upgrading from v1.x:
 
-1. Update your composer.json to require `^2.0`
-2. The component name remains `file-picker`
-3. Events have been renamed:
+1. The composer package has been renamed from `anil/livewire-file-picker` to `anil/file-picker`. Update your `composer.json` require entry and run `composer update`.
+2. Update your composer.json to require `^2.0`
+3. The component name remains `file-picker`
+4. Events have been renamed:
     - `imagesSelected` → `filesSelected`
-    - `file-picker-selected` remains the same
-4. Configuration file structure has changed - republish config
+    - `file-picker-selected` remains the same — but its payload is now a single array (one parameter on the listener) rather than positional args. See [Livewire events](#livewire-events).
+5. Configuration file structure has changed — republish config
+6. The Livewire view's auto-open-on-click behaviour for the details panel was removed; on tablet/mobile the panel only opens via the new edit-icon button. No code change needed unless you published the views.
 
 ## Static Analysis
 
