@@ -28,12 +28,12 @@ final class StatsCommand extends Command
 
         $this->info('Media library statistics');
         $this->line('---');
-        $this->line('Total items     : '.$totalCount);
-        $this->line('Total size      : '.$this->formatBytes($totalSize));
-        $this->line('Favorites       : '.$favorites);
-        $this->line('Trashed         : '.$trashed);
-        $this->line('Folders in use  : '.$folders);
-        $this->line('Distinct tags   : '.$tagsCount);
+        $this->line('Total items     : ' . $totalCount);
+        $this->line('Total size      : ' . $this->formatBytes($totalSize));
+        $this->line('Favorites       : ' . $favorites);
+        $this->line('Trashed         : ' . $trashed);
+        $this->line('Folders in use  : ' . $folders);
+        $this->line('Distinct tags   : ' . $tagsCount);
         $this->line('---');
 
         $byType = is_array($stats['by_type'] ?? null) ? $stats['by_type'] : [];
@@ -65,10 +65,10 @@ final class StatsCommand extends Command
     private function formatBytes(int $bytes): string
     {
         return match (true) {
-            $bytes >= 1_073_741_824 => number_format($bytes / 1_073_741_824, 2).' GB',
-            $bytes >= 1_048_576 => number_format($bytes / 1_048_576, 2).' MB',
-            $bytes >= 1_024 => number_format($bytes / 1_024, 2).' KB',
-            default => $bytes.' bytes',
+            $bytes >= 1_073_741_824 => number_format($bytes / 1_073_741_824, 2) . ' GB',
+            $bytes >= 1_048_576     => number_format($bytes / 1_048_576, 2) . ' MB',
+            $bytes >= 1_024         => number_format($bytes / 1_024, 2) . ' KB',
+            default                 => $bytes . ' bytes',
         };
     }
 }

@@ -56,7 +56,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applySearchFilter(Builder $query): void
     {
@@ -66,7 +66,7 @@ trait HandlesMediaQuery
             return;
         }
 
-        $searchTerm = '%'.$search.'%';
+        $searchTerm = '%' . $search . '%';
         $table = $query->getModel()->getTable();
         $hasAlt = Schema::hasColumn($table, 'alt');
 
@@ -79,7 +79,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyTypeFilter(Builder $query): void
     {
@@ -101,7 +101,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyAllowedTypesFilter(Builder $query): void
     {
@@ -126,7 +126,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyFolderFilter(Builder $query): void
     {
@@ -146,7 +146,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyTagFilter(Builder $query): void
     {
@@ -160,7 +160,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyFavoritesFilter(Builder $query): void
     {
@@ -172,7 +172,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyOwnershipScope(Builder $query): void
     {
@@ -192,7 +192,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applyCustomFilters(Builder $query): void
     {
@@ -218,7 +218,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Builder<Model>  $query
+     * @param Builder<Model> $query
      */
     protected function applySorting(Builder $query): void
     {
@@ -229,7 +229,8 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  Collection<int, Model>  $media
+     * @param Collection<int, Model> $media
+     *
      * @return array<int, array<string, mixed>>
      */
     protected function transformMediaCollection(Collection $media): array
@@ -243,7 +244,8 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  array<int>  $ids
+     * @param array<int> $ids
+     *
      * @return Collection<int, Model>
      */
     protected function getMediaByIds(array $ids): Collection
@@ -262,7 +264,7 @@ trait HandlesMediaQuery
     }
 
     /**
-     * @param  array<int>  $ids
+     * @param array<int> $ids
      */
     protected function deleteMediaByIds(array $ids): int
     {

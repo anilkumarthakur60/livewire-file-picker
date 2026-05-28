@@ -15,9 +15,9 @@ enum SortField: string
     {
         return match ($this) {
             self::CREATED_AT => 'Date',
-            self::FILENAME => 'Name',
-            self::SIZE => 'Size',
-            self::EXTENSION => 'Type',
+            self::FILENAME   => 'Name',
+            self::SIZE       => 'Size',
+            self::EXTENSION  => 'Type',
         };
     }
 }

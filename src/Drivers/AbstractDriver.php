@@ -64,21 +64,6 @@ abstract class AbstractDriver implements MediaDriverInterface
         return $query->whereRaw('1 = 0');
     }
 
-    protected function deletedAtColumn(): string
-    {
-        $instance = new ($this->modelClass());
-
-        if (method_exists($instance, 'getDeletedAtColumn')) {
-            $column = $instance->getDeletedAtColumn();
-
-            if (is_string($column) && $column !== '') {
-                return $column;
-            }
-        }
-
-        return 'deleted_at';
-    }
-
     public function findById(int $id): ?Model
     {
         return $this->query()->find($id);
@@ -90,7 +75,8 @@ abstract class AbstractDriver implements MediaDriverInterface
     }
 
     /**
-     * @param  array<int>  $ids
+     * @param array<int> $ids
+     *
      * @return Collection<int, Model>
      */
     public function findByIds(array $ids): Collection
@@ -186,7 +172,7 @@ abstract class AbstractDriver implements MediaDriverInterface
     }
 
     /**
-     * @param  array<int>  $ids
+     * @param array<int> $ids
      */
     public function deleteMany(array $ids): int
     {
@@ -251,7 +237,7 @@ abstract class AbstractDriver implements MediaDriverInterface
     }
 
     /**
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      */
     public function setTags(int $id, array $tags): bool
     {
@@ -330,7 +316,7 @@ abstract class AbstractDriver implements MediaDriverInterface
     }
 
     /**
-     * @param  array<int>  $ids
+     * @param array<int> $ids
      */
     public function bulkMoveToFolder(array $ids, ?string $folder): int
     {
@@ -437,7 +423,7 @@ abstract class AbstractDriver implements MediaDriverInterface
             $type = is_string($row->aggregate_type) ? $row->aggregate_type : 'document';
             $byType[$type] = [
                 'count' => (int) $row->total,
-                'size' => (int) $row->total_size,
+                'size'  => (int) $row->total_size,
             ];
         }
 
@@ -447,13 +433,13 @@ abstract class AbstractDriver implements MediaDriverInterface
         $trashed = $this->modelUsesSoftDeletes() ? (int) $this->queryOnlyTrashed()->count() : 0;
 
         return [
-            'total_count' => $totalCount,
-            'total_size' => $totalSize,
+            'total_count'     => $totalCount,
+            'total_size'      => $totalSize,
             'favorites_count' => $favorites,
-            'trashed_count' => $trashed,
-            'folders_count' => count($this->getFolders()),
-            'tags_count' => count($this->getAllTags()),
-            'by_type' => $byType,
+            'trashed_count'   => $trashed,
+            'folders_count'   => count($this->getFolders()),
+            'tags_count'      => count($this->getAllTags()),
+            'by_type'         => $byType,
         ];
     }
 
@@ -468,6 +454,21 @@ abstract class AbstractDriver implements MediaDriverInterface
     public function transform(Model $media): array
     {
         return $this->transformer->transform($media);
+    }
+
+    protected function deletedAtColumn(): string
+    {
+        $instance = new ($this->modelClass());
+
+        if (method_exists($instance, 'getDeletedAtColumn')) {
+            $column = $instance->getDeletedAtColumn();
+
+            if (is_string($column) && $column !== '') {
+                return $column;
+            }
+        }
+
+        return 'deleted_at';
     }
 
     /**

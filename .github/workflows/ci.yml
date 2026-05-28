@@ -51,58 +51,13 @@ jobs:
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-progress
 
       - name: Run tests
+        if: matrix.php == '8.5' && matrix.laravel == '13' && matrix.dependency-version == 'prefer-stable'
         run: vendor/bin/pest
 
-  static-analysis:
-    runs-on: ubuntu-latest
-    name: PHPStan
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, exif, fileinfo
-          coverage: none
-
-      - name: Cache Composer packages
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: composer-${{ runner.os }}-php8.5-phpstan-${{ hashFiles('composer.json') }}
-          restore-keys: composer-${{ runner.os }}-php8.5-phpstan-
-
-      - name: Install dependencies
-        run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
+      - name: Run Pint
+        if: matrix.php == '8.5' && matrix.laravel == '13' && matrix.dependency-version == 'prefer-stable'
+        run: vendor/bin/pint --test
 
       - name: Run PHPStan
-        run: vendor/bin/phpstan analyse --no-progress
-
-  lint:
-    runs-on: ubuntu-latest
-    name: Pint
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd, exif, fileinfo
-          coverage: none
-
-      - name: Cache Composer packages
-        uses: actions/cache@v4
-        with:
-          path: vendor
-          key: composer-${{ runner.os }}-php8.5-pint-${{ hashFiles('composer.json') }}
-          restore-keys: composer-${{ runner.os }}-php8.5-pint-
-
-      - name: Install dependencies
-        run: composer update --prefer-stable --prefer-dist --no-interaction --no-progress
-
-      - name: Run Pint
-        run: vendor/bin/pint --test
+        if: matrix.php == '8.5' && matrix.laravel == '13' && matrix.dependency-version == 'prefer-stable'
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G

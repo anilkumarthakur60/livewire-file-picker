@@ -12,8 +12,8 @@ interface CustomFilter
     /**
      * Apply the custom filter logic to the query.
      *
-     * @param  Builder<Model>  $query
-     * @param  array<string, mixed>  $values
+     * @param Builder<Model> $query
+     * @param array<string, mixed> $values
      */
     public function apply(Builder $query, array $values): void;
 }

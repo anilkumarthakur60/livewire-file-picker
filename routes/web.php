@@ -10,7 +10,7 @@ $middleware = config('file-picker.route_middleware', ['web']);
 
 Route::middleware($middleware)->group(function (): void {
     Route::get('/vendor/anil/livewire-file-picker/{file}', function (string $file) {
-        $basePath = realpath(__DIR__.'/../resources/');
+        $basePath = realpath(__DIR__ . '/../resources/');
 
         if ($basePath === false) {
             abort(404);
@@ -18,7 +18,7 @@ Route::middleware($middleware)->group(function (): void {
 
         $mapping = [
             '.css' => ['dir' => 'css', 'type' => 'text/css; charset=utf-8'],
-            '.js' => ['dir' => 'js', 'type' => 'application/javascript; charset=utf-8'],
+            '.js'  => ['dir' => 'js', 'type' => 'application/javascript; charset=utf-8'],
         ];
 
         $matched = null;
@@ -26,6 +26,7 @@ Route::middleware($middleware)->group(function (): void {
         foreach ($mapping as $ext => $config) {
             if (str_ends_with($file, $ext)) {
                 $matched = $config;
+
                 break;
             }
         }
@@ -34,7 +35,7 @@ Route::middleware($middleware)->group(function (): void {
             abort(404);
         }
 
-        $filePath = $basePath.'/'.$matched['dir'].'/'.$file;
+        $filePath = $basePath . '/' . $matched['dir'] . '/' . $file;
         $realPath = realpath($filePath);
 
         if ($realPath === false || ! str_starts_with($realPath, $basePath) || ! file_exists($realPath)) {
@@ -42,7 +43,7 @@ Route::middleware($middleware)->group(function (): void {
         }
 
         return response((string) file_get_contents($realPath), 200, [
-            'Content-Type' => $matched['type'],
+            'Content-Type'  => $matched['type'],
             'Cache-Control' => 'public, max-age=31536000',
         ]);
     })->where('file', '[a-zA-Z0-9._-]+\.(css|js)');

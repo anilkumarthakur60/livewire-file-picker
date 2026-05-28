@@ -77,7 +77,7 @@ return new class extends Migration
             if (Schema::hasColumn('media', $column)) {
                 try {
                     Schema::table('media', function (Blueprint $table) use ($column): void {
-                        $table->dropIndex('media_'.$column.'_index');
+                        $table->dropIndex('media_' . $column . '_index');
                     });
                 } catch (Throwable) {
                     // Index may not exist (idempotent down)

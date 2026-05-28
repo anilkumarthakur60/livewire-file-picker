@@ -9,7 +9,7 @@ class DriverNotFoundException extends FilePickerException
     public static function forDriver(string $driver): self
     {
         return new self(
-            "File picker driver [{$driver}] is not a valid class or does not implement MediaDriverInterface."
+            "File picker driver [{$driver}] is not a valid class or does not implement MediaDriverInterface.",
         );
     }
 }

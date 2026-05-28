@@ -32,80 +32,11 @@ final class FilePickerProvider extends ServiceProvider
         $this->registerCommands();
     }
 
-    private function registerLivewireComponents(): void
-    {
-        Livewire::component('file-picker', FilePicker::class);
-    }
-
-    private function registerViews(): void
-    {
-        $this->loadViewsFrom(__DIR__.'/../../resources/views', 'file-picker');
-    }
-
-    private function registerTranslations(): void
-    {
-        $this->loadTranslationsFrom(__DIR__.'/../../resources/lang', 'file-picker');
-    }
-
-    private function registerRoutes(): void
-    {
-        $this->loadRoutesFrom(__DIR__.'/../../routes/web.php');
-    }
-
-    private function registerPublishing(): void
-    {
-        if (! $this->app->runningInConsole()) {
-            return;
-        }
-        $this->publishes([
-            __DIR__.'/../../config/file-picker.php' => config_path('file-picker.php'),
-        ], 'file-picker-config');
-        $this->publishes([
-            __DIR__.'/../../resources/views' => resource_path('views/vendor/file-picker'),
-        ], 'file-picker-views');
-        $this->publishes([
-            __DIR__.'/../../resources/css' => public_path('vendor/file-picker'),
-            __DIR__.'/../../resources/js' => public_path('vendor/file-picker'),
-        ], 'file-picker-assets');
-        $this->publishes([
-            __DIR__.'/../../database/migrations' => database_path('migrations'),
-        ], 'file-picker-migrations');
-        $this->publishes([
-            __DIR__.'/../../resources/lang' => lang_path('vendor/file-picker'),
-        ], 'file-picker-lang');
-        $this->publishes([
-            __DIR__.'/../../config/file-picker.php' => config_path('file-picker.php'),
-            __DIR__.'/../../resources/views' => resource_path('views/vendor/file-picker'),
-            __DIR__.'/../../resources/css' => public_path('vendor/file-picker'),
-            __DIR__.'/../../resources/js' => public_path('vendor/file-picker'),
-            __DIR__.'/../../resources/lang' => lang_path('vendor/file-picker'),
-            __DIR__.'/../../database/migrations' => database_path('migrations'),
-        ], 'file-picker');
-    }
-
-    private function registerMigrations(): void
-    {
-        $this->loadMigrationsFrom(__DIR__.'/../../database/migrations');
-    }
-
-    private function registerCommands(): void
-    {
-        if (! $this->app->runningInConsole()) {
-            return;
-        }
-        $this->commands([
-            PruneTrashCommand::class,
-            PruneOrphansCommand::class,
-            StatsCommand::class,
-            InstallCommand::class,
-        ]);
-    }
-
     public function register(): void
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../../config/file-picker.php',
-            'file-picker'
+            __DIR__ . '/../../config/file-picker.php',
+            'file-picker',
         );
         $this->app->singleton(MediaTransformerInterface::class, MediaTransformer::class);
         $this->app->singleton(FilePickerAuthorizationInterface::class, function (): FilePickerAuthorizationInterface {
@@ -134,9 +65,78 @@ final class FilePickerProvider extends ServiceProvider
         });
     }
 
+    private function registerLivewireComponents(): void
+    {
+        Livewire::component('file-picker', FilePicker::class);
+    }
+
+    private function registerViews(): void
+    {
+        $this->loadViewsFrom(__DIR__ . '/../../resources/views', 'file-picker');
+    }
+
+    private function registerTranslations(): void
+    {
+        $this->loadTranslationsFrom(__DIR__ . '/../../resources/lang', 'file-picker');
+    }
+
+    private function registerRoutes(): void
+    {
+        $this->loadRoutesFrom(__DIR__ . '/../../routes/web.php');
+    }
+
+    private function registerPublishing(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+        $this->publishes([
+            __DIR__ . '/../../config/file-picker.php' => config_path('file-picker.php'),
+        ], 'file-picker-config');
+        $this->publishes([
+            __DIR__ . '/../../resources/views' => resource_path('views/vendor/file-picker'),
+        ], 'file-picker-views');
+        $this->publishes([
+            __DIR__ . '/../../resources/css' => public_path('vendor/file-picker'),
+            __DIR__ . '/../../resources/js'  => public_path('vendor/file-picker'),
+        ], 'file-picker-assets');
+        $this->publishes([
+            __DIR__ . '/../../database/migrations' => database_path('migrations'),
+        ], 'file-picker-migrations');
+        $this->publishes([
+            __DIR__ . '/../../resources/lang' => lang_path('vendor/file-picker'),
+        ], 'file-picker-lang');
+        $this->publishes([
+            __DIR__ . '/../../config/file-picker.php' => config_path('file-picker.php'),
+            __DIR__ . '/../../resources/views'        => resource_path('views/vendor/file-picker'),
+            __DIR__ . '/../../resources/css'          => public_path('vendor/file-picker'),
+            __DIR__ . '/../../resources/js'           => public_path('vendor/file-picker'),
+            __DIR__ . '/../../resources/lang'         => lang_path('vendor/file-picker'),
+            __DIR__ . '/../../database/migrations'    => database_path('migrations'),
+        ], 'file-picker');
+    }
+
+    private function registerMigrations(): void
+    {
+        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
+    }
+
+    private function registerCommands(): void
+    {
+        if (! $this->app->runningInConsole()) {
+            return;
+        }
+        $this->commands([
+            PruneTrashCommand::class,
+            PruneOrphansCommand::class,
+            StatsCommand::class,
+            InstallCommand::class,
+        ]);
+    }
+
     private function resolveCustomDriver(
         string $driverName,
-        MediaTransformerInterface $transformer
+        MediaTransformerInterface $transformer,
     ): MediaDriverInterface {
         if (! class_exists($driverName)) {
             throw DriverNotFoundException::forDriver($driverName);

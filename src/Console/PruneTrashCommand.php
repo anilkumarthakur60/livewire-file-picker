@@ -8,6 +8,7 @@ use Anil\LivewireFilePicker\Contracts\MediaDriverInterface;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
+use Throwable;
 
 final class PruneTrashCommand extends Command
 {
@@ -39,7 +40,7 @@ final class PruneTrashCommand extends Command
         $count = (int) $query->count();
 
         if ($count === 0) {
-            $this->info('No trashed items older than '.$days.' days found.');
+            $this->info('No trashed items older than ' . $days . ' days found.');
 
             return self::SUCCESS;
         }
@@ -61,8 +62,8 @@ final class PruneTrashCommand extends Command
                 try {
                     $driver->forceDelete((int) $key);
                     $deleted++;
-                } catch (\Throwable $e) {
-                    $this->error('Could not delete media #'.$key.': '.$e->getMessage());
+                } catch (Throwable $e) {
+                    $this->error('Could not delete media #' . $key . ': ' . $e->getMessage());
                 }
             }
         });

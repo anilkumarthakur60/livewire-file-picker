@@ -67,7 +67,7 @@ final class PlankMediaDriver extends AbstractDriver
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     public function upload(TemporaryUploadedFile $file, array $options = []): Model
     {
@@ -111,7 +111,7 @@ final class PlankMediaDriver extends AbstractDriver
             : null;
 
         $directory = $folder !== null
-            ? rtrim($this->directory, '/').'/'.trim($folder, '/')
+            ? rtrim($this->directory, '/') . '/' . trim($folder, '/')
             : $this->directory;
 
         $tags = $this->resolveTags($options);
@@ -158,12 +158,13 @@ final class PlankMediaDriver extends AbstractDriver
             if ($e instanceof DuplicateMediaException || $e instanceof StorageQuotaExceededException) {
                 throw $e;
             }
+
             throw UploadFailedException::fromPrevious($originalName, $e);
         }
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     public function replaceFile(int $id, TemporaryUploadedFile $file, array $options = []): Model
     {
@@ -225,7 +226,7 @@ final class PlankMediaDriver extends AbstractDriver
         }
 
         $newDirectory = $newFolder !== null
-            ? rtrim($this->directory, '/').'/'.trim($newFolder, '/')
+            ? rtrim($this->directory, '/') . '/' . trim($newFolder, '/')
             : $this->directory;
 
         $currentDirectory = is_string($media->getAttribute('directory'))
@@ -282,7 +283,7 @@ final class PlankMediaDriver extends AbstractDriver
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      */
     private function resolveUserId(array $options): ?int
     {
@@ -304,7 +305,8 @@ final class PlankMediaDriver extends AbstractDriver
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
+     *
      * @return array<int, string>|null
      */
     private function resolveTags(array $options): ?array
@@ -325,7 +327,7 @@ final class PlankMediaDriver extends AbstractDriver
     }
 
     /**
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      *
      * @throws StorageQuotaExceededException
      */

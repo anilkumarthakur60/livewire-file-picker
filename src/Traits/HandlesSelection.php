@@ -14,11 +14,6 @@ namespace Anil\LivewireFilePicker\Traits;
  */
 trait HandlesSelection
 {
-    protected function normalizeSelected(): void
-    {
-        $this->selected = array_values(array_map(intval(...), array_filter($this->selected)));
-    }
-
     public function isItemSelected(int $mediaId): bool
     {
         $this->normalizeSelected();
@@ -29,6 +24,28 @@ trait HandlesSelection
     public function getCheckboxState(int $mediaId): string
     {
         return $this->isItemSelected($mediaId) ? 'checked' : '';
+    }
+
+    public function getSelectedCountProperty(): int
+    {
+        $this->normalizeSelected();
+
+        return count($this->selected);
+    }
+
+    public function isMaxSelectionReached(): bool
+    {
+        return count($this->selected) >= $this->maxFiles;
+    }
+
+    public function getRemainingSelectionsProperty(): int
+    {
+        return max(0, $this->maxFiles - count($this->selected));
+    }
+
+    protected function normalizeSelected(): void
+    {
+        $this->selected = array_values(array_map(intval(...), array_filter($this->selected)));
     }
 
     protected function toggleMultipleSelection(int $mediaId): void
@@ -47,22 +64,5 @@ trait HandlesSelection
     protected function toggleSingleSelection(int $mediaId): void
     {
         $this->selected = $this->isItemSelected($mediaId) ? [] : [$mediaId];
-    }
-
-    public function getSelectedCountProperty(): int
-    {
-        $this->normalizeSelected();
-
-        return count($this->selected);
-    }
-
-    public function isMaxSelectionReached(): bool
-    {
-        return count($this->selected) >= $this->maxFiles;
-    }
-
-    public function getRemainingSelectionsProperty(): int
-    {
-        return max(0, $this->maxFiles - count($this->selected));
     }
 }

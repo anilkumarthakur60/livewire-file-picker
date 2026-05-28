@@ -22,6 +22,7 @@ use Livewire\Attributes\Locked;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Throwable;
 
 class FilePicker extends Component
 {
@@ -184,8 +185,8 @@ class FilePicker extends Component
     // =====================================================================
 
     /**
-     * @param  array<int|string>|int|null  $selected
-     * @param  array<string>  $allowedTypes
+     * @param array<int|string>|int|null $selected
+     * @param array<string> $allowedTypes
      */
     public function mount(
         bool $multiple = false,
@@ -205,7 +206,7 @@ class FilePicker extends Component
         $this->maxFiles = $maxFiles;
         $this->allowedTypes = $allowedTypes;
         $this->inputName = $inputName;
-        $this->inputId = $inputId !== '' ? $inputId : 'file-picker-'.uniqid();
+        $this->inputId = $inputId !== '' ? $inputId : 'file-picker-' . uniqid();
         $this->formId = $formId;
         $this->autoSubmit = $autoSubmit;
         $this->callbackFunction = $callbackFunction;
@@ -228,12 +229,12 @@ class FilePicker extends Component
         $customFilters = config('file-picker.ui.custom_filters', []);
 
         return view($viewName, [
-            'fileTypes' => $this->getAvailableFileTypes(),
-            'customFilters' => $customFilters,
-            'sortFields' => SortField::cases(),
-            'sortDirections' => SortDirection::cases(),
+            'fileTypes'        => $this->getAvailableFileTypes(),
+            'customFilters'    => $customFilters,
+            'sortFields'       => SortField::cases(),
+            'sortDirections'   => SortDirection::cases(),
             'availableFolders' => $this->getAvailableFolders(),
-            'availableTags' => $this->getAvailableTags(),
+            'availableTags'    => $this->getAvailableTags(),
         ]);
     }
 
@@ -531,7 +532,7 @@ class FilePicker extends Component
     }
 
     /**
-     * @param  array<int>  $mediaIds
+     * @param array<int> $mediaIds
      */
     public function bulkDelete(array $mediaIds): void
     {
@@ -570,7 +571,7 @@ class FilePicker extends Component
     }
 
     /**
-     * @param  array<int>  $mediaIds
+     * @param array<int> $mediaIds
      */
     public function bulkRestore(array $mediaIds): void
     {
@@ -714,7 +715,7 @@ class FilePicker extends Component
     }
 
     /**
-     * @param  array<int>  $mediaIds
+     * @param array<int> $mediaIds
      */
     public function bulkMoveToFolder(array $mediaIds, ?string $folder): void
     {
@@ -763,8 +764,8 @@ class FilePicker extends Component
 
             $this->uploadMessage = 'File replaced successfully.';
             $this->uploadStatus = 'success';
-        } catch (\Throwable $e) {
-            $this->uploadMessage = 'Replacement failed: '.$e->getMessage();
+        } catch (Throwable $e) {
+            $this->uploadMessage = 'Replacement failed: ' . $e->getMessage();
             $this->uploadStatus = 'error';
         } finally {
             $this->cancelReplacing();
@@ -928,7 +929,7 @@ class FilePicker extends Component
         return match (true) {
             $count === 0 => 'No items selected',
             $count === 1 => '1 item selected',
-            default => "{$count} items selected",
+            default      => "{$count} items selected",
         };
     }
 
@@ -942,7 +943,7 @@ class FilePicker extends Component
         $base = url('/file-picker/download-zip');
         $query = http_build_query(['ids' => $this->selected]);
 
-        return $base.'?'.$query;
+        return $base . '?' . $query;
     }
 
     // =====================================================================
@@ -995,18 +996,19 @@ class FilePicker extends Component
         $this->dispatch('filesSelected', selected: $this->selected, inputName: $this->inputName);
 
         $this->dispatch('file-picker-selected', [
-            'selected' => $this->selected,
-            'inputName' => $this->inputName,
-            'inputId' => $this->inputId,
-            'formId' => $this->formId,
-            'multiple' => $this->multiple,
-            'autoSubmit' => $this->autoSubmit,
+            'selected'         => $this->selected,
+            'inputName'        => $this->inputName,
+            'inputId'          => $this->inputId,
+            'formId'           => $this->formId,
+            'multiple'         => $this->multiple,
+            'autoSubmit'       => $this->autoSubmit,
             'callbackFunction' => $this->callbackFunction,
         ]);
     }
 
     /**
-     * @param  array<int|string>|int|null  $selected
+     * @param array<int|string>|int|null $selected
+     *
      * @return array<int>
      */
     private function normalizeSelectedInput(array|int|null $selected): array
@@ -1061,7 +1063,7 @@ class FilePicker extends Component
                 $types[] = [
                     'value' => $fileType->value,
                     'label' => $fileType->label(),
-                    'icon' => $fileType->icon(),
+                    'icon'  => $fileType->icon(),
                 ];
             }
         }

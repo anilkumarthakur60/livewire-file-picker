@@ -41,25 +41,8 @@ class FilePickerMedia extends Media
     protected $guarded = ['id'];
 
     /**
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'size' => 'integer',
-            'width' => 'integer',
-            'height' => 'integer',
-            'duration' => 'integer',
-            'is_favorite' => 'boolean',
-            'user_id' => 'integer',
-            'download_count' => 'integer',
-            'tags' => 'array',
-            'custom_properties' => 'array',
-        ];
-    }
-
-    /**
-     * @param  Builder<self>  $query
+     * @param Builder<self> $query
+     *
      * @return Builder<self>
      */
     public function scopeFavorites(Builder $query): Builder
@@ -68,7 +51,8 @@ class FilePickerMedia extends Media
     }
 
     /**
-     * @param  Builder<self>  $query
+     * @param Builder<self> $query
+     *
      * @return Builder<self>
      */
     public function scopeInFolder(Builder $query, ?string $folder): Builder
@@ -81,7 +65,8 @@ class FilePickerMedia extends Media
     }
 
     /**
-     * @param  Builder<self>  $query
+     * @param Builder<self> $query
+     *
      * @return Builder<self>
      */
     public function scopeWithTag(Builder $query, string $tag): Builder
@@ -90,11 +75,30 @@ class FilePickerMedia extends Media
     }
 
     /**
-     * @param  Builder<self>  $query
+     * @param Builder<self> $query
+     *
      * @return Builder<self>
      */
     public function scopeOwnedBy(Builder $query, int $userId): Builder
     {
         return $query->where('user_id', $userId);
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'size'              => 'integer',
+            'width'             => 'integer',
+            'height'            => 'integer',
+            'duration'          => 'integer',
+            'is_favorite'       => 'boolean',
+            'user_id'           => 'integer',
+            'download_count'    => 'integer',
+            'tags'              => 'array',
+            'custom_properties' => 'array',
+        ];
     }
 }

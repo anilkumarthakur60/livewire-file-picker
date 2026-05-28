@@ -13,6 +13,7 @@ use Anil\LivewireFilePicker\Exceptions\UploadFailedException;
 use Illuminate\Validation\ValidationException;
 use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Livewire\WithFileUploads;
+use Throwable;
 
 /**
  * @property array<int, TemporaryUploadedFile> $uploadedFiles
@@ -81,7 +82,7 @@ trait HandlesFileUpload
 
         try {
             $file->delete();
-        } catch (\Throwable) {
+        } catch (Throwable) {
             // Ignore cleanup errors
         }
 
@@ -106,16 +107,16 @@ trait HandlesFileUpload
         $rules = [
             'uploadedFiles.*' => [
                 'file',
-                'max:'.$maxSize,
+                'max:' . $maxSize,
             ],
         ];
 
         if ($allowedMimes !== []) {
-            $rules['uploadedFiles.*'][] = 'mimes:'.implode(',', $this->getAllowedExtensionsForValidation());
+            $rules['uploadedFiles.*'][] = 'mimes:' . implode(',', $this->getAllowedExtensionsForValidation());
         }
 
         $this->validate($rules, [
-            'uploadedFiles.*.max' => 'The file must not be larger than '.((int) $maxSize / 1024).' MB.',
+            'uploadedFiles.*.max'   => 'The file must not be larger than ' . ((int) $maxSize / 1024) . ' MB.',
             'uploadedFiles.*.mimes' => 'The file type is not allowed.',
         ]);
     }
@@ -147,9 +148,9 @@ trait HandlesFileUpload
                 } catch (UploadFailedException $e) {
                     $failedCount++;
                     $failedFiles[] = $e->getMessage();
-                } catch (\Throwable $e) {
+                } catch (Throwable $e) {
                     $failedCount++;
-                    $failedFiles[] = $file->getClientOriginalName().': '.$e->getMessage();
+                    $failedFiles[] = $file->getClientOriginalName() . ': ' . $e->getMessage();
                 }
             }
 
@@ -176,18 +177,18 @@ trait HandlesFileUpload
             try {
                 $file->delete();
 
-                $jsonFilePath = $file->getRealPath().'.json';
+                $jsonFilePath = $file->getRealPath() . '.json';
                 if (file_exists($jsonFilePath)) {
                     @unlink($jsonFilePath);
                 }
-            } catch (\Throwable) {
+            } catch (Throwable) {
                 // Ignore cleanup errors
             }
         }
     }
 
     /**
-     * @param  array<string>  $failedFiles
+     * @param array<string> $failedFiles
      */
     protected function setUploadResultMessage(int $uploaded, int $failed, int $duplicates, array $failedFiles): void
     {
@@ -210,7 +211,7 @@ trait HandlesFileUpload
         }
 
         if ($uploaded === 0 && $duplicates === 0) {
-            $this->uploadMessage = 'Upload failed: '.implode(', ', $failedFiles);
+            $this->uploadMessage = 'Upload failed: ' . implode(', ', $failedFiles);
             $this->uploadStatus = 'error';
 
             return;
@@ -223,14 +224,14 @@ trait HandlesFileUpload
         }
 
         if ($duplicates > 0) {
-            $parts[] = "{$duplicates} duplicate".($duplicates === 1 ? '' : 's');
+            $parts[] = "{$duplicates} duplicate" . ($duplicates === 1 ? '' : 's');
         }
 
         if ($failed > 0) {
             $parts[] = "{$failed} failed";
         }
 
-        $this->uploadMessage = implode(', ', $parts).'.';
+        $this->uploadMessage = implode(', ', $parts) . '.';
         $this->uploadStatus = $failed > 0 ? 'warning' : 'success';
     }
 

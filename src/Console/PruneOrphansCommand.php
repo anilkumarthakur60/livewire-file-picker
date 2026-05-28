@@ -8,6 +8,7 @@ use Anil\LivewireFilePicker\Contracts\MediaDriverInterface;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Throwable;
 
 final class PruneOrphansCommand extends Command
 {
@@ -49,13 +50,13 @@ final class PruneOrphansCommand extends Command
             if (is_int($key) || is_numeric($key)) {
                 try {
                     $driver->forceDelete((int) $key);
-                } catch (\Throwable $e) {
-                    $this->error('Could not remove orphan #'.$keyString.': '.$e->getMessage());
+                } catch (Throwable $e) {
+                    $this->error('Could not remove orphan #' . $keyString . ': ' . $e->getMessage());
                 }
             }
         });
 
-        $this->info(($dryRun ? 'Would remove ' : 'Removed ').$orphaned.' orphan record(s).');
+        $this->info(($dryRun ? 'Would remove ' : 'Removed ') . $orphaned . ' orphan record(s).');
 
         return self::SUCCESS;
     }
@@ -90,8 +91,8 @@ final class PruneOrphansCommand extends Command
             return '';
         }
 
-        $ext = is_string($extension) && $extension !== '' ? '.'.$extension : '';
+        $ext = is_string($extension) && $extension !== '' ? '.' . $extension : '';
 
-        return ltrim(rtrim($directory, '/').'/'.$filename.$ext, '/');
+        return ltrim(rtrim($directory, '/') . '/' . $filename . $ext, '/');
     }
 }

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Anil\LivewireFilePicker\Exceptions;
 
+use Throwable;
+
 class UploadFailedException extends FilePickerException
 {
     public static function storageFailed(string $filename): self
@@ -11,7 +13,7 @@ class UploadFailedException extends FilePickerException
         return new self("Failed to store the uploaded file: {$filename}");
     }
 
-    public static function fromPrevious(string $filename, \Throwable $previous): self
+    public static function fromPrevious(string $filename, Throwable $previous): self
     {
         return new self(
             message: "Upload failed for file: {$filename} - {$previous->getMessage()}",

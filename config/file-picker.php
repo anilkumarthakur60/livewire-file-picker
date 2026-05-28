@@ -36,9 +36,9 @@ return [
 
     'drivers' => [
         'plank' => [
-            'model' => FilePickerMedia::class,
-            'disk' => env('FILE_PICKER_DISK', 'public'),
-            'directory' => env('FILE_PICKER_DIRECTORY', 'media'),
+            'model'      => FilePickerMedia::class,
+            'disk'       => env('FILE_PICKER_DISK', 'public'),
+            'directory'  => env('FILE_PICKER_DIRECTORY', 'media'),
             'visibility' => env('FILE_PICKER_VISIBILITY', 'public'),
         ],
     ],
@@ -61,9 +61,9 @@ return [
     */
 
     'defaults' => [
-        'multiple' => false,
-        'max_files' => 40,
-        'per_page' => 24,
+        'multiple'     => false,
+        'max_files'    => 40,
+        'per_page'     => 24,
         'show_preview' => true,
     ],
 
@@ -86,14 +86,14 @@ return [
     */
 
     'extensions' => [
-        'image' => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'tiff', 'tif', 'avif'],
-        'video' => ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'wmv', 'flv', 'm4v'],
-        'audio' => ['mp3', 'wav', 'aac', 'ogg', 'flac', 'm4a', 'wma', 'aiff'],
-        'document' => ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'md', 'epub'],
-        'spreadsheet' => ['xls', 'xlsx', 'csv', 'ods', 'numbers'],
+        'image'        => ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico', 'tiff', 'tif', 'avif'],
+        'video'        => ['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv', 'wmv', 'flv', 'm4v'],
+        'audio'        => ['mp3', 'wav', 'aac', 'ogg', 'flac', 'm4a', 'wma', 'aiff'],
+        'document'     => ['pdf', 'doc', 'docx', 'txt', 'rtf', 'odt', 'md', 'epub'],
+        'spreadsheet'  => ['xls', 'xlsx', 'csv', 'ods', 'numbers'],
         'presentation' => ['ppt', 'pptx', 'odp', 'key'],
-        'archive' => ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'],
-        'code' => ['js', 'ts', 'php', 'html', 'css', 'scss', 'json', 'xml', 'yaml', 'yml', 'vue', 'jsx', 'tsx', 'py', 'rb', 'go', 'rs', 'java', 'c', 'cpp', 'h', 'sh', 'bash'],
+        'archive'      => ['zip', 'rar', '7z', 'tar', 'gz', 'bz2', 'xz'],
+        'code'         => ['js', 'ts', 'php', 'html', 'css', 'scss', 'json', 'xml', 'yaml', 'yml', 'vue', 'jsx', 'tsx', 'py', 'rb', 'go', 'rs', 'java', 'c', 'cpp', 'h', 'sh', 'bash'],
     ],
 
     /*
@@ -108,7 +108,7 @@ return [
     */
 
     'sorting' => [
-        'field' => 'created_at',
+        'field'     => 'created_at',
         'direction' => 'desc',
     ],
 
@@ -136,35 +136,35 @@ return [
 
         // Theme colors — fully customizable
         'colors' => [
-            'primary' => '#0073aa',
+            'primary'       => '#0073aa',
             'primary_hover' => '#005a87',
-            'danger' => '#ef4444',
-            'success' => '#10b981',
-            'warning' => '#f59e0b',
+            'danger'        => '#ef4444',
+            'success'       => '#10b981',
+            'warning'       => '#f59e0b',
         ],
 
         // Appearance
-        'font_family' => "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+        'font_family'   => "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
         'border_radius' => 8, // px
 
         // Grid layout — columns per breakpoint
         'grid_columns_xs' => 2, // < 480px
         'grid_columns_sm' => 3, // 481–768px
         'grid_columns_md' => 4, // 769–1024px
-        'grid_columns' => 6, // 1025–1535px (large / default desktop)
+        'grid_columns'    => 6, // 1025–1535px (large / default desktop)
         'grid_columns_xl' => 8, // ≥ 1536px (extra large)
-        'grid_gap' => 14, // px — gap between grid items
+        'grid_gap'        => 14, // px — gap between grid items
 
         // Sidebar
         'sidebar_width' => 300, // px
 
         // Overlay settings
-        'backdrop_blur' => 12, // px
+        'backdrop_blur'    => 12, // px
         'backdrop_opacity' => 0.6,
-        'z_index' => 9999,
+        'z_index'          => 9999,
 
         // Upload area
-        'upload_preview_size' => 120, // px — thumbnail size in upload preview grid
+        'upload_preview_size'    => 120, // px — thumbnail size in upload preview grid
         'upload_area_max_height' => 400, // px — max height of upload pending area before scroll
 
         // Filter types shown in dropdown. Set to null to auto-detect from FileType enum.
@@ -197,26 +197,26 @@ return [
     */
 
     'features' => [
-        'upload' => true,
-        'delete' => true,
-        'bulk_delete' => true,
-        'edit_alt' => true,
-        'rename' => true,
-        'replace' => true,
-        'search' => true,
-        'filter' => true,
-        'sorting' => true,
-        'drag_drop' => true,
-        'refresh' => true,
+        'upload'              => true,
+        'delete'              => true,
+        'bulk_delete'         => true,
+        'edit_alt'            => true,
+        'rename'              => true,
+        'replace'             => true,
+        'search'              => true,
+        'filter'              => true,
+        'sorting'             => true,
+        'drag_drop'           => true,
+        'refresh'             => true,
         'keyboard_navigation' => true,
-        'paste_upload' => true,
-        'favorites' => true,
-        'tags' => true,
-        'folders' => true,
-        'trash' => true,
-        'download' => true,
-        'bulk_download' => true,
-        'stats' => true,
+        'paste_upload'        => true,
+        'favorites'           => true,
+        'tags'                => true,
+        'folders'             => true,
+        'trash'               => true,
+        'download'            => true,
+        'bulk_download'       => true,
+        'stats'               => true,
     ],
 
     /*
@@ -235,7 +235,7 @@ return [
     */
 
     'duplicate_detection' => [
-        'enabled' => true,
+        'enabled'  => true,
         'strategy' => env('FILE_PICKER_DUPLICATE_STRATEGY', 'reuse'),
     ],
 
@@ -255,7 +255,7 @@ return [
     */
 
     'trash' => [
-        'enabled' => true,
+        'enabled'        => true,
         'retention_days' => 30,
     ],
 
@@ -271,7 +271,7 @@ return [
     */
 
     'ownership' => [
-        'auto_assign' => true,
+        'auto_assign'    => true,
         'scope_to_owner' => false,
     ],
 
@@ -287,7 +287,7 @@ return [
     */
 
     'storage_quota' => [
-        'global' => env('FILE_PICKER_QUOTA_GLOBAL', 0),
+        'global'   => env('FILE_PICKER_QUOTA_GLOBAL', 0),
         'per_user' => env('FILE_PICKER_QUOTA_PER_USER', 0),
     ],
 
@@ -298,55 +298,55 @@ return [
     */
 
     'texts' => [
-        'modal_title' => 'Media Library',
-        'tab_upload' => 'Upload Files',
-        'tab_library' => 'Media Library',
-        'tab_trash' => 'Trash',
-        'drop_zone' => 'Drop files here or click to upload',
-        'drop_zone_hint' => 'Supports: Images, Videos, Documents, and more',
-        'search_placeholder' => 'Search media...',
-        'filter_label' => 'Filter by type:',
-        'sort_label' => 'Sort by:',
-        'no_items' => 'No media found',
-        'no_items_hint' => 'Upload some files to get started',
-        'no_trash' => 'Trash is empty',
-        'upload_button' => 'Upload Files',
-        'cancel_button' => 'Cancel',
-        'insert_button' => 'Insert Selected',
-        'clear_selection' => 'Clear',
-        'refresh_button' => 'Refresh',
-        'delete_confirm' => 'Are you sure you want to move this file to trash?',
+        'modal_title'          => 'Media Library',
+        'tab_upload'           => 'Upload Files',
+        'tab_library'          => 'Media Library',
+        'tab_trash'            => 'Trash',
+        'drop_zone'            => 'Drop files here or click to upload',
+        'drop_zone_hint'       => 'Supports: Images, Videos, Documents, and more',
+        'search_placeholder'   => 'Search media...',
+        'filter_label'         => 'Filter by type:',
+        'sort_label'           => 'Sort by:',
+        'no_items'             => 'No media found',
+        'no_items_hint'        => 'Upload some files to get started',
+        'no_trash'             => 'Trash is empty',
+        'upload_button'        => 'Upload Files',
+        'cancel_button'        => 'Cancel',
+        'insert_button'        => 'Insert Selected',
+        'clear_selection'      => 'Clear',
+        'refresh_button'       => 'Refresh',
+        'delete_confirm'       => 'Are you sure you want to move this file to trash?',
         'force_delete_confirm' => 'Permanently delete this file? This cannot be undone.',
-        'restore_confirm' => 'Restore this file from trash?',
-        'bulk_delete_confirm' => 'Move the selected files to trash?',
-        'delete_button' => 'Move to Trash',
-        'force_delete_button' => 'Delete forever',
-        'restore_button' => 'Restore',
-        'bulk_delete_button' => 'Trash',
+        'restore_confirm'      => 'Restore this file from trash?',
+        'bulk_delete_confirm'  => 'Move the selected files to trash?',
+        'delete_button'        => 'Move to Trash',
+        'force_delete_button'  => 'Delete forever',
+        'restore_button'       => 'Restore',
+        'bulk_delete_button'   => 'Trash',
         'edit_alt_placeholder' => 'Enter alt text...',
-        'edit_alt_help' => 'Press Enter to save',
-        'rename_placeholder' => 'Enter new filename...',
-        'rename_button' => 'Rename',
-        'replace_button' => 'Replace File',
-        'sidebar_title' => 'Attachment Details',
-        'sidebar_empty' => 'Select a file to view details',
-        'url_label' => 'File URL',
-        'alt_label' => 'Alt Text',
-        'alt_placeholder' => 'Click to add alt text...',
-        'preview_title' => 'Selected',
-        'remove_all' => 'Remove All',
-        'favorite_button' => 'Favorite',
-        'unfavorite_button' => 'Remove from favorites',
-        'favorites_only' => 'Favorites only',
-        'tags_label' => 'Tags',
-        'tags_placeholder' => 'Add tag and press Enter',
-        'folder_label' => 'Folder',
-        'folder_root' => 'All folders',
-        'folder_none' => '(no folder)',
-        'move_to_folder' => 'Move to folder...',
-        'download_button' => 'Download',
-        'download_all_button' => 'Download as ZIP',
-        'duplicate_message' => 'A duplicate file was detected and reused.',
+        'edit_alt_help'        => 'Press Enter to save',
+        'rename_placeholder'   => 'Enter new filename...',
+        'rename_button'        => 'Rename',
+        'replace_button'       => 'Replace File',
+        'sidebar_title'        => 'Attachment Details',
+        'sidebar_empty'        => 'Select a file to view details',
+        'url_label'            => 'File URL',
+        'alt_label'            => 'Alt Text',
+        'alt_placeholder'      => 'Click to add alt text...',
+        'preview_title'        => 'Selected',
+        'remove_all'           => 'Remove All',
+        'favorite_button'      => 'Favorite',
+        'unfavorite_button'    => 'Remove from favorites',
+        'favorites_only'       => 'Favorites only',
+        'tags_label'           => 'Tags',
+        'tags_placeholder'     => 'Add tag and press Enter',
+        'folder_label'         => 'Folder',
+        'folder_root'          => 'All folders',
+        'folder_none'          => '(no folder)',
+        'move_to_folder'       => 'Move to folder...',
+        'download_button'      => 'Download',
+        'download_all_button'  => 'Download as ZIP',
+        'duplicate_message'    => 'A duplicate file was detected and reused.',
     ],
 
     /*

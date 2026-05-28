@@ -8,6 +8,7 @@ use Anil\LivewireFilePicker\Contracts\MediaTransformerInterface;
 use Anil\LivewireFilePicker\Enums\FileType;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Throwable;
 
 final class MediaTransformer implements MediaTransformerInterface
 {
@@ -29,56 +30,56 @@ final class MediaTransformer implements MediaTransformerInterface
         $height = ModelAttributeHelper::nullableInt($media, 'height');
 
         return [
-            'id' => ModelAttributeHelper::int($media, 'id'),
-            'filename' => ModelAttributeHelper::string($media, 'filename'),
-            'url' => $url,
-            'thumbnail_url' => $fileType === FileType::IMAGE ? $url : null,
-            'download_url' => $this->buildDownloadUrl($media),
-            'size' => $size,
-            'size_formatted' => $this->formatSize($size),
-            'mime_type' => ModelAttributeHelper::string($media, 'mime_type'),
-            'extension' => ModelAttributeHelper::string($media, 'extension'),
-            'aggregate_type' => ModelAttributeHelper::string($media, 'aggregate_type', 'document'),
-            'alt' => ModelAttributeHelper::nullableString($media, 'alt'),
-            'file_type' => $fileType->value,
-            'file_type_label' => $fileType->label(),
-            'file_type_color' => $fileType->color(),
-            'icon' => $fileType->icon(),
-            'created_at' => $createdAt,
+            'id'                   => ModelAttributeHelper::int($media, 'id'),
+            'filename'             => ModelAttributeHelper::string($media, 'filename'),
+            'url'                  => $url,
+            'thumbnail_url'        => $fileType === FileType::IMAGE ? $url : null,
+            'download_url'         => $this->buildDownloadUrl($media),
+            'size'                 => $size,
+            'size_formatted'       => $this->formatSize($size),
+            'mime_type'            => ModelAttributeHelper::string($media, 'mime_type'),
+            'extension'            => ModelAttributeHelper::string($media, 'extension'),
+            'aggregate_type'       => ModelAttributeHelper::string($media, 'aggregate_type', 'document'),
+            'alt'                  => ModelAttributeHelper::nullableString($media, 'alt'),
+            'file_type'            => $fileType->value,
+            'file_type_label'      => $fileType->label(),
+            'file_type_color'      => $fileType->color(),
+            'icon'                 => $fileType->icon(),
+            'created_at'           => $createdAt,
             'created_at_formatted' => $createdAt?->format('M j, Y') ?? '',
-            'created_at_diff' => $createdAt?->diffForHumans() ?? '',
-            'width' => $width,
-            'height' => $height,
-            'dimensions' => ($width !== null && $height !== null) ? "{$width} x {$height}" : null,
-            'duration' => ModelAttributeHelper::nullableInt($media, 'duration'),
-            'duration_formatted' => $this->formatDuration(ModelAttributeHelper::nullableInt($media, 'duration')),
-            'hash' => ModelAttributeHelper::nullableString($media, 'hash'),
-            'folder' => ModelAttributeHelper::nullableString($media, 'folder'),
-            'tags' => $this->extractTags($media),
-            'is_favorite' => (bool) $media->getAttribute('is_favorite'),
-            'user_id' => ModelAttributeHelper::nullableInt($media, 'user_id'),
-            'download_count' => ModelAttributeHelper::int($media, 'download_count'),
-            'deleted_at' => $deletedAt,
+            'created_at_diff'      => $createdAt?->diffForHumans() ?? '',
+            'width'                => $width,
+            'height'               => $height,
+            'dimensions'           => ($width !== null && $height !== null) ? "{$width} x {$height}" : null,
+            'duration'             => ModelAttributeHelper::nullableInt($media, 'duration'),
+            'duration_formatted'   => $this->formatDuration(ModelAttributeHelper::nullableInt($media, 'duration')),
+            'hash'                 => ModelAttributeHelper::nullableString($media, 'hash'),
+            'folder'               => ModelAttributeHelper::nullableString($media, 'folder'),
+            'tags'                 => $this->extractTags($media),
+            'is_favorite'          => (bool) $media->getAttribute('is_favorite'),
+            'user_id'              => ModelAttributeHelper::nullableInt($media, 'user_id'),
+            'download_count'       => ModelAttributeHelper::int($media, 'download_count'),
+            'deleted_at'           => $deletedAt,
             'deleted_at_formatted' => $deletedAt?->format('M j, Y') ?? '',
-            'is_trashed' => $deletedAt !== null,
+            'is_trashed'           => $deletedAt !== null,
         ];
     }
 
     public function formatSize(int $bytes): string
     {
         if ($bytes >= 1_073_741_824) {
-            return number_format($bytes / 1_073_741_824, 2).' GB';
+            return number_format($bytes / 1_073_741_824, 2) . ' GB';
         }
 
         if ($bytes >= 1_048_576) {
-            return number_format($bytes / 1_048_576, 2).' MB';
+            return number_format($bytes / 1_048_576, 2) . ' MB';
         }
 
         if ($bytes >= 1_024) {
-            return number_format($bytes / 1_024, 2).' KB';
+            return number_format($bytes / 1_024, 2) . ' KB';
         }
 
-        return $bytes.' bytes';
+        return $bytes . ' bytes';
     }
 
     private function formatDuration(?int $seconds): ?string
@@ -135,8 +136,8 @@ final class MediaTransformer implements MediaTransformerInterface
         }
 
         try {
-            return url('/file-picker/download/'.(int) $key);
-        } catch (\Throwable) {
+            return url('/file-picker/download/' . (int) $key);
+        } catch (Throwable) {
             return '';
         }
     }

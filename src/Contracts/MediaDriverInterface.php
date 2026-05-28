@@ -56,7 +56,8 @@ interface MediaDriverInterface
     /**
      * Find media items by an array of IDs (preserving order).
      *
-     * @param  array<int>  $ids
+     * @param array<int> $ids
+     *
      * @return Collection<int, Model>
      */
     public function findByIds(array $ids): Collection;
@@ -69,7 +70,7 @@ interface MediaDriverInterface
     /**
      * Upload a file and create a media record.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      *
      * @throws UploadFailedException
      * @throws DuplicateMediaException
@@ -80,7 +81,7 @@ interface MediaDriverInterface
     /**
      * Replace the underlying file of an existing media record.
      *
-     * @param  array<string, mixed>  $options
+     * @param array<string, mixed> $options
      *
      * @throws MediaNotFoundException
      * @throws UploadFailedException
@@ -111,7 +112,8 @@ interface MediaDriverInterface
     /**
      * Soft-delete multiple media items by IDs.
      *
-     * @param  array<int>  $ids
+     * @param array<int> $ids
+     *
      * @return int Number of successfully deleted items.
      */
     public function deleteMany(array $ids): int;
@@ -147,7 +149,7 @@ interface MediaDriverInterface
     /**
      * Replace the entire tag list on a media item.
      *
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      *
      * @throws MediaNotFoundException
      */
@@ -177,7 +179,7 @@ interface MediaDriverInterface
     /**
      * Move multiple media items into a folder.
      *
-     * @param  array<int>  $ids
+     * @param array<int> $ids
      */
     public function bulkMoveToFolder(array $ids, ?string $folder): int;
 

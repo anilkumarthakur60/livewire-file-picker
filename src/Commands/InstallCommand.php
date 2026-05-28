@@ -53,14 +53,14 @@ final class InstallCommand extends Command
         if (File::exists($target) && ! $force) {
             $this->components->twoColumnDetail(
                 '<fg=yellow>config/file-picker.php</>',
-                '<fg=yellow>SKIPPED</> (already exists, use --force to overwrite)'
+                '<fg=yellow>SKIPPED</> (already exists, use --force to overwrite)',
             );
 
             return;
         }
 
         $this->callSilently('vendor:publish', [
-            '--tag' => 'file-picker-config',
+            '--tag'   => 'file-picker-config',
             '--force' => $force,
         ]);
 
@@ -72,7 +72,7 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag' => 'file-picker-migrations',
+            '--tag'   => 'file-picker-migrations',
             '--force' => $force,
         ]);
 
@@ -97,13 +97,13 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag' => 'file-picker-views',
+            '--tag'   => 'file-picker-views',
             '--force' => $force,
         ]);
 
         $this->components->twoColumnDetail(
             'resources/views/vendor/file-picker',
-            '<fg=green>PUBLISHED</>'
+            '<fg=green>PUBLISHED</>',
         );
     }
 
@@ -112,13 +112,13 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag' => 'file-picker-assets',
+            '--tag'   => 'file-picker-assets',
             '--force' => $force,
         ]);
 
         $this->components->twoColumnDetail(
             'public/vendor/anil/livewire-file-picker',
-            '<fg=green>PUBLISHED</>'
+            '<fg=green>PUBLISHED</>',
         );
     }
 
@@ -127,13 +127,13 @@ final class InstallCommand extends Command
         $force = $this->option('force');
 
         $this->callSilently('vendor:publish', [
-            '--tag' => 'file-picker-lang',
+            '--tag'   => 'file-picker-lang',
             '--force' => $force,
         ]);
 
         $this->components->twoColumnDetail(
             'lang/vendor/file-picker',
-            '<fg=green>PUBLISHED</>'
+            '<fg=green>PUBLISHED</>',
         );
     }
 

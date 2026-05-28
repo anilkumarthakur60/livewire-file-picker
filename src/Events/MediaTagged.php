@@ -11,7 +11,7 @@ final readonly class MediaTagged
     use Dispatchable;
 
     /**
-     * @param  array<int, string>  $tags
+     * @param array<int, string> $tags
      */
     public function __construct(
         public int $mediaId,

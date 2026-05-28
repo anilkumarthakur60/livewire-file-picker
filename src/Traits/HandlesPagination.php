@@ -53,25 +53,6 @@ trait HandlesPagination
         $this->currentPage = 1;
     }
 
-    protected function calculatePagination(int $totalItems): void
-    {
-        $this->totalItems = $totalItems;
-        $this->totalPages = $this->perPage > 0
-            ? (int) ceil($totalItems / $this->perPage)
-            : 1;
-
-        $this->currentPage = match (true) {
-            $this->currentPage > $this->totalPages && $this->totalPages > 0 => $this->totalPages,
-            $this->currentPage < 1 => 1,
-            default => $this->currentPage,
-        };
-    }
-
-    protected function getPaginationOffset(): int
-    {
-        return ($this->currentPage - 1) * $this->perPage;
-    }
-
     /**
      * @return array<int|string>
      */
@@ -121,5 +102,24 @@ trait HandlesPagination
         $end = min($start + $this->perPage - 1, $this->totalItems);
 
         return "Showing {$start} to {$end} of {$this->totalItems} items";
+    }
+
+    protected function calculatePagination(int $totalItems): void
+    {
+        $this->totalItems = $totalItems;
+        $this->totalPages = $this->perPage > 0
+            ? (int) ceil($totalItems / $this->perPage)
+            : 1;
+
+        $this->currentPage = match (true) {
+            $this->currentPage > $this->totalPages && $this->totalPages > 0 => $this->totalPages,
+            $this->currentPage < 1                                          => 1,
+            default                                                         => $this->currentPage,
+        };
+    }
+
+    protected function getPaginationOffset(): int
+    {
+        return ($this->currentPage - 1) * $this->perPage;
     }
 }

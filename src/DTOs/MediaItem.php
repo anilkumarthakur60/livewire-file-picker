@@ -67,38 +67,38 @@ final readonly class MediaItem implements Arrayable
     public function toArray(): array
     {
         return [
-            'id' => $this->id,
-            'filename' => $this->filename,
-            'url' => $this->url,
-            'thumbnail_url' => $this->thumbnailUrl,
-            'size' => $this->size,
-            'size_formatted' => $this->formattedSize(),
-            'mime_type' => $this->mimeType,
-            'extension' => $this->extension,
-            'aggregate_type' => $this->aggregateType,
-            'alt' => $this->alt,
-            'file_type' => $this->fileType->value,
-            'file_type_label' => $this->fileType->label(),
-            'file_type_color' => $this->fileType->color(),
-            'icon' => $this->icon,
-            'created_at' => $this->createdAt,
+            'id'                   => $this->id,
+            'filename'             => $this->filename,
+            'url'                  => $this->url,
+            'thumbnail_url'        => $this->thumbnailUrl,
+            'size'                 => $this->size,
+            'size_formatted'       => $this->formattedSize(),
+            'mime_type'            => $this->mimeType,
+            'extension'            => $this->extension,
+            'aggregate_type'       => $this->aggregateType,
+            'alt'                  => $this->alt,
+            'file_type'            => $this->fileType->value,
+            'file_type_label'      => $this->fileType->label(),
+            'file_type_color'      => $this->fileType->color(),
+            'icon'                 => $this->icon,
+            'created_at'           => $this->createdAt,
             'created_at_formatted' => $this->createdAt->format('M j, Y'),
-            'created_at_diff' => $this->createdAt->diffForHumans(),
-            'width' => $this->width,
-            'height' => $this->height,
-            'dimensions' => $this->dimensions(),
-            'duration' => $this->duration,
-            'duration_formatted' => $this->formattedDuration(),
+            'created_at_diff'      => $this->createdAt->diffForHumans(),
+            'width'                => $this->width,
+            'height'               => $this->height,
+            'dimensions'           => $this->dimensions(),
+            'duration'             => $this->duration,
+            'duration_formatted'   => $this->formattedDuration(),
         ];
     }
 
     public function formattedSize(): string
     {
         return match (true) {
-            $this->size >= 1_073_741_824 => number_format($this->size / 1_073_741_824, 2).' GB',
-            $this->size >= 1_048_576 => number_format($this->size / 1_048_576, 2).' MB',
-            $this->size >= 1_024 => number_format($this->size / 1_024, 2).' KB',
-            default => $this->size.' bytes',
+            $this->size >= 1_073_741_824 => number_format($this->size / 1_073_741_824, 2) . ' GB',
+            $this->size >= 1_048_576     => number_format($this->size / 1_048_576, 2) . ' MB',
+            $this->size >= 1_024         => number_format($this->size / 1_024, 2) . ' KB',
+            default                      => $this->size . ' bytes',
         };
     }
 

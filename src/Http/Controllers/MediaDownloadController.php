@@ -128,7 +128,7 @@ final class MediaDownloadController
 
         $zip->close();
 
-        $downloadName = 'media-'.date('Ymd-His').'.zip';
+        $downloadName = 'media-' . date('Ymd-His') . '.zip';
 
         return response()->download($tempPath, $downloadName, [
             'Content-Type' => 'application/zip',
@@ -165,9 +165,9 @@ final class MediaDownloadController
             return '';
         }
 
-        $ext = is_string($extension) && $extension !== '' ? '.'.$extension : '';
+        $ext = is_string($extension) && $extension !== '' ? '.' . $extension : '';
 
-        return ltrim(rtrim($directory, '/').'/'.$filename.$ext, '/');
+        return ltrim(rtrim($directory, '/') . '/' . $filename . $ext, '/');
     }
 
     private function getDownloadFilename(Model $media): string
@@ -176,13 +176,13 @@ final class MediaDownloadController
         $ext = $media->getAttribute('extension');
 
         $base = is_string($name) && $name !== '' ? $name : 'file';
-        $extString = is_string($ext) && $ext !== '' ? '.'.$ext : '';
+        $extString = is_string($ext) && $ext !== '' ? '.' . $ext : '';
 
-        return $base.$extString;
+        return $base . $extString;
     }
 
     /**
-     * @param  array<string, true>  $usedNames
+     * @param array<string, true> $usedNames
      */
     private function uniqueZipEntryName(string $name, array $usedNames): string
     {
@@ -192,14 +192,14 @@ final class MediaDownloadController
 
         $info = pathinfo($name);
         $stem = $info['filename'] !== '' ? $info['filename'] : 'file';
-        $ext = isset($info['extension']) && $info['extension'] !== '' ? '.'.$info['extension'] : '';
+        $ext = isset($info['extension']) && $info['extension'] !== '' ? '.' . $info['extension'] : '';
 
         $i = 1;
 
-        while (isset($usedNames[$stem.'-'.$i.$ext])) {
+        while (isset($usedNames[$stem . '-' . $i . $ext])) {
             $i++;
         }
 
-        return $stem.'-'.$i.$ext;
+        return $stem . '-' . $i . $ext;
     }
 }
