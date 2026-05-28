@@ -1,5 +1,5 @@
 {
-    "name": "anil/livewire-file-picker",
+    "name": "anil/file-picker",
     "description": "A WordPress-like file picker component for Laravel Livewire. Supports images, videos, audio, documents and all file types with a beautiful modal interface.",
     "type": "library",
     "license": "MIT",

@@ -52,7 +52,7 @@ A WordPress-like file picker component for Laravel Livewire. Supports images, vi
 ### 1. Install via Composer
 
 ```bash
-composer require anil/livewire-file-picker
+composer require anil/file-picker
 ```
 
 ### 2. Run the install command
