@@ -1,11 +1,11 @@
-# Livewire File Picker
+# File Picker
 
-A WordPress-like file picker component for Laravel Livewire. Supports images, videos, audio, documents, and all file types with a beautiful modal interface.
+A powerful media library and file picker component for Laravel. Supports images, videos, audio, documents, and all file types with a beautiful modal interface.
 
 ## Features
 
 - 📁 **All File Types** — Images, videos, audio, documents, spreadsheets, presentations, archives, and code files
-- 🎨 **Beautiful UI** — Modern, clean interface inspired by WordPress media library, with a responsive Sheet-style detail panel on tablet/mobile
+- 🎨 **Beautiful UI** — Modern, clean interface with a responsive Sheet-style detail panel on tablet/mobile
 - 🔍 **Search & Filter** — Quick search and filter by file type, folder, tag, or favorite
 - 📤 **Drag & Drop + Paste** — Drag-drop files in, or paste from clipboard
 - 🚨 **Upload Error Reporting** — Validation errors render per-file, browser-side failures (413 / network) surface in the same toast
@@ -23,7 +23,7 @@ A WordPress-like file picker component for Laravel Livewire. Supports images, vi
 - 📥 **Downloads** — Force-download single files or bulk download as ZIP
 - 🛠️ **Console Commands** — `file-picker:prune-trash`, `file-picker:prune-orphans`, `file-picker:stats`
 - ⚙️ **Highly Configurable** — Feature toggles, theme colors, custom drivers, custom authorization, custom filters
-- 🎯 **Form Integration** — Works with Livewire components and traditional HTML forms
+- 🎯 **Form Integration** — Works with components and traditional HTML forms
 - ♿ **Accessible** — Keyboard navigation, focus management, Esc-to-close
 
 ## Requirements
@@ -107,7 +107,7 @@ The component pushes its CSS into `@stack('head')` and its JS into `@stack('scri
 <livewire:file-picker input-name="avatar" :allowed-types="['image']" />
 ```
 
-### In a Livewire component
+### In a component
 
 ```php
 namespace App\Livewire;
@@ -128,13 +128,13 @@ class PostForm extends Component
 
     public function render()
     {
-        return view('livewire.post-form');
+        return view('components.post-form');
     }
 }
 ```
 
 ```blade
-{{-- resources/views/livewire/post-form.blade.php --}}
+{{-- resources/views/components/post-form.blade.php --}}
 <div>
     <livewire:file-picker
         input-name="media"
@@ -241,9 +241,9 @@ window.addEventListener('file-picker:selected', (event) => {
 
 Each item in `selected` is an object with: `id`, `url`, `filename`, `size`, `extension`, `file_type`, `alt`, `created_at`.
 
-### Livewire events
+### Component events
 
-Two Livewire events fire every time the selection changes. Pick the one that fits your handler shape:
+Two component events fire every time the selection changes. Pick the one that fits your handler shape:
 
 **`filesSelected`** — named arguments, easiest for typed signatures:
 
