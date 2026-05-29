@@ -1,119 +1,95 @@
 # File Picker
 
-A powerful media library and file picker component for Laravel. Supports images, videos, audio, documents, and all file types with a beautiful modal interface.
+A powerful media library and file picker component for Laravel Livewire. Supports images, videos, audio, documents, and every other file type, all behind a polished modal interface.
+
+![File Picker screenshot](img.png)
 
 ## Features
 
-- 📁 **All File Types** — Images, videos, audio, documents, spreadsheets, presentations, archives, and code files
-- 🎨 **Beautiful UI** — Modern, clean interface with a responsive Sheet-style detail panel on tablet/mobile
-- 🔍 **Search & Filter** — Quick search and filter by file type, folder, tag, or favorite
-- 📤 **Drag & Drop + Paste** — Drag-drop files in, or paste from clipboard
-- 🚨 **Upload Error Reporting** — Validation errors render per-file, browser-side failures (413 / network) surface in the same toast
-- ✅ **Single / Multiple Selection** — Configurable max-files
-- 🗑️ **Trash & Restore** — Soft-delete with recoverable trash + retention-based pruning
-- 🔁 **Replace File** — Update an existing media record's file in place
-- 🪪 **Hash & Duplicate Detection** — SHA-256 dedup with `reuse`, `reject`, or `allow` strategies
-- ⭐ **Favorites** — Star important items
-- 🏷️ **Tags** — Free-form labels for richer organization
-- 📂 **Folders** — Group media into folders with single & bulk move
-- ✏️ **Inline Editing** — Rename and edit alt text without leaving the picker
-- 👤 **Ownership Tracking** — Auto-record `user_id`, optionally scope library per user
-- 📊 **Storage Quotas** — Global and per-user storage caps
-- 📈 **Statistics API** — Aggregate counts / sizes / by-type via `FilePicker::getStats()`
-- 📥 **Downloads** — Force-download single files or bulk download as ZIP
-- 🛠️ **Console Commands** — `file-picker:prune-trash`, `file-picker:prune-orphans`, `file-picker:stats`
-- ⚙️ **Highly Configurable** — Feature toggles, theme colors, custom drivers, custom authorization, custom filters
-- 🎯 **Form Integration** — Works with components and traditional HTML forms
-- ♿ **Accessible** — Keyboard navigation, focus management, Esc-to-close
+- 📁 **All file types** — images, videos, audio, documents, spreadsheets, presentations, archives, code
+- 🎨 **Clean, themeable UI** — fully recolorable through config, with a responsive sheet-style detail panel on tablet/mobile
+- 🔍 **Search & filter** — by file type, folder, tag, or favorite
+- 📤 **Drag & drop + paste** — drop files in, or paste straight from the clipboard
+- 🚨 **Upload error reporting** — per-file validation messages, browser-side failures (413/network) surface in the same toast
+- ✅ **Single / multiple selection** — with a configurable `max_files`
+- 🗑️ **Trash & restore** — soft-delete with retention-based pruning
+- 🔁 **Replace file** — swap the file behind a media row without changing its ID
+- 🪪 **Hash & duplicate detection** — SHA-256 dedup with `reuse`, `reject`, or `allow` strategies
+- ⭐ **Favorites, 🏷️ tags, 📂 folders** — organize without inventing your own taxonomy
+- ✏️ **Inline editing** — rename and edit alt text without leaving the picker
+- 👤 **Ownership tracking** — auto-record `user_id`, optionally scope per user
+- 📊 **Storage quotas** — global and per-user
+- 📈 **Statistics API** — counts, sizes, by-type via `FilePicker::getStats()`
+- 📥 **Downloads** — single files or bulk ZIP
+- 🛠️ **Console commands** — `file-picker:prune-trash`, `file-picker:prune-orphans`, `file-picker:stats`
+- 🎯 **Form integration** — Livewire components and traditional HTML forms
+- ♿ **Accessible** — keyboard nav, focus management, Esc to close
 
 ## Requirements
 
-- PHP 8.2+ (also tested on 8.3 / 8.4)
+- PHP 8.2+
 - Laravel 11.x, 12.x, or 13.x
 - Livewire 3.x or 4.x
-- [plank/laravel-mediable](https://github.com/plank/laravel-mediable) ^6.0 — installed automatically
+- [`plank/laravel-mediable`](https://github.com/plank/laravel-mediable) ^6.0 — installed automatically
 
 ## Installation
 
-### 1. Install via Composer
-
 ```bash
 composer require anil/file-picker
-```
-
-### 2. Run the install command
-
-```bash
 php artisan file-picker:install
 ```
 
-This single command will:
-- Publish `config/file-picker.php`
-- Run the package migration — an additive migration that adds the package's columns (`folder`, `tags`, `is_favorite`, `hash`, etc.) to Plank's `media` table
+`file-picker:install` publishes `config/file-picker.php` and runs an **additive** migration that adds the columns the package needs (`folder`, `tags`, `is_favorite`, `hash`, `width`, `height`, `duration`, `user_id`, `download_count`, `custom_properties`, `deleted_at`) to Plank's existing `media` table. CSS/JS are served via a built-in route — nothing to publish, nothing to compile.
 
-That's it. Assets (CSS/JS) are served automatically via a built-in route — no need to publish them.
-
-### Optional flags
+### Install command flags
 
 ```bash
-# Overwrite already-published files
-php artisan file-picker:install --force
-
-# Skip running migrations (publish only)
-php artisan file-picker:install --no-migrate
-
-# Also publish blade views for UI customisation
-php artisan file-picker:install --views
-
-# Also publish language files to override text strings
-php artisan file-picker:install --lang
-
-# Publish CSS/JS to public/ (not required — served via route by default)
-php artisan file-picker:install --assets
+php artisan file-picker:install --force         # overwrite already-published files
+php artisan file-picker:install --no-migrate    # publish only, skip migrations
+php artisan file-picker:install --views         # publish blade views for UI overrides
+php artisan file-picker:install --lang          # publish language files
+php artisan file-picker:install --assets        # publish CSS/JS to public/ (optional)
 ```
 
-### 3. Add stack slots to your layout
+### Add stack slots to your layout
 
-The component pushes its CSS into `@stack('head')` and its JS into `@stack('scripts')`. Add these to your layout if not already present:
+The component pushes CSS to `@stack('head')` and JS to `@stack('scripts')`:
 
 ```blade
 <!DOCTYPE html>
 <html>
 <head>
-    ...
     @stack('head')
 </head>
 <body>
-    ...
     {{ $slot }}
-
     @stack('scripts')
 </body>
 </html>
 ```
 
-## Usage
-
-### Basic usage
+## Quick Start
 
 ```blade
-{{-- Single file selection --}}
+{{-- Single file --}}
 <livewire:file-picker input-name="featured_image" />
 
-{{-- Multiple file selection --}}
+{{-- Multiple files, up to 5 --}}
 <livewire:file-picker input-name="gallery" :multiple="true" :max-files="5" />
 
 {{-- Restrict to specific file types --}}
 <livewire:file-picker input-name="avatar" :allowed-types="['image']" />
 ```
 
-### In a component
+## Usage
+
+### In a Livewire component
 
 ```php
 namespace App\Livewire;
 
-use Livewire\Component;
 use Livewire\Attributes\On;
+use Livewire\Component;
 
 class PostForm extends Component
 {
@@ -134,7 +110,6 @@ class PostForm extends Component
 ```
 
 ```blade
-{{-- resources/views/components/post-form.blade.php --}}
 <div>
     <livewire:file-picker
         input-name="media"
@@ -154,11 +129,8 @@ class PostForm extends Component
 <form id="my-form" action="/posts" method="POST">
     @csrf
 
-    {{-- Single file — populates a hidden input on selection --}}
-    <livewire:file-picker
-        input-name="featured_image"
-        form-id="my-form"
-    />
+    {{-- Single file — populates a hidden input --}}
+    <livewire:file-picker input-name="featured_image" form-id="my-form" />
 
     {{-- Multiple files — auto-submit form after selection --}}
     <livewire:file-picker
@@ -176,10 +148,7 @@ class PostForm extends Component
 ### With a JavaScript callback
 
 ```blade
-<livewire:file-picker
-    input-name="media"
-    callback-function="onMediaSelected"
-/>
+<livewire:file-picker input-name="media" callback-function="onMediaSelected" />
 
 <script>
 function onMediaSelected(selected, inputName, inputId) {
@@ -190,47 +159,47 @@ function onMediaSelected(selected, inputName, inputId) {
 
 ## Component Properties
 
-| Property           | Type          | Default    | Description                                        |
-|--------------------|---------------|------------|----------------------------------------------------|
-| `multiple`         | `bool`        | `false`    | Allow multiple file selection                      |
-| `maxFiles`         | `int`         | `10`       | Maximum number of files that can be selected       |
-| `selected`         | `array`       | `[]`       | Pre-selected media IDs                             |
-| `allowedTypes`     | `array`       | `[]`       | Restrict to specific file types (empty = all)      |
-| `inputName`        | `string`      | `'files'`  | Name attribute for the hidden input(s)             |
-| `inputId`          | `string`      | auto       | ID attribute for the hidden input                  |
-| `formId`           | `string`      | `''`       | Form ID to target for auto-submit                  |
-| `autoSubmit`       | `bool`        | `false`    | Auto-submit the form after selection               |
-| `callbackFunction` | `string`      | `''`       | Global JS function name called after selection     |
-| `buttonLabel`      | `string`      | auto       | Override the trigger button label                  |
-| `showPreview`      | `bool`        | `true`     | Show selected file previews below the button       |
-| `perPage`          | `int`         | `24`       | Items per page in the media library                |
+| Property           | Type     | Default   | Description                                    |
+| ------------------ | -------- | --------- | ---------------------------------------------- |
+| `multiple`         | `bool`   | `false`   | Allow multiple selection                       |
+| `maxFiles`         | `int`    | `10`      | Maximum number of files that can be selected   |
+| `selected`         | `array`  | `[]`      | Pre-selected media IDs                         |
+| `allowedTypes`     | `array`  | `[]`      | Restrict to specific file types (empty = all)  |
+| `inputName`        | `string` | `'files'` | Name for the hidden input(s)                   |
+| `inputId`          | `string` | auto      | ID for the hidden input                        |
+| `formId`           | `string` | `''`      | Form ID to target for auto-submit              |
+| `autoSubmit`       | `bool`   | `false`   | Auto-submit the form after selection           |
+| `callbackFunction` | `string` | `''`      | Global JS function name called after selection |
+| `buttonLabel`      | `string` | auto      | Override the trigger button label              |
+| `showPreview`      | `bool`   | `true`    | Show selected file previews below the button   |
+| `perPage`          | `int`    | `24`      | Items per page in the media library            |
 
 ## Allowed File Types
 
-Restrict the picker to one or more types via `allowedTypes`:
+Restrict the picker via `allowedTypes`:
 
 ```blade
 <livewire:file-picker :allowed-types="['image', 'document']" />
 ```
 
-| Type           | Extensions                                                            |
-|----------------|-----------------------------------------------------------------------|
-| `image`        | jpg, jpeg, png, gif, webp, svg, bmp, ico, tiff, avif                 |
+| Type           | Extensions                                                          |
+| -------------- | ------------------------------------------------------------------- |
+| `image`        | jpg, jpeg, png, gif, webp, svg, bmp, ico, tiff, avif                |
 | `video`        | mp4, webm, ogg, mov, avi, mkv, wmv, flv, m4v                        |
 | `audio`        | mp3, wav, aac, ogg, flac, m4a, wma, aiff                            |
 | `document`     | pdf, doc, docx, txt, rtf, odt, md, epub                             |
-| `spreadsheet`  | xls, xlsx, csv, ods, numbers                                         |
-| `presentation` | ppt, pptx, odp, key                                                  |
-| `archive`      | zip, rar, 7z, tar, gz, bz2, xz                                       |
+| `spreadsheet`  | xls, xlsx, csv, ods, numbers                                        |
+| `presentation` | ppt, pptx, odp, key                                                 |
+| `archive`      | zip, rar, 7z, tar, gz, bz2, xz                                      |
 | `code`         | js, ts, php, html, css, json, yaml, vue, jsx, tsx, py, go, rs, etc. |
 
-You can customize extensions per type in `config/file-picker.php` under `extensions`.
+Extensions per type can be customised in `config/file-picker.php` under `extensions`.
 
 ## Events
 
 ### JavaScript event
 
-Fired on the `window` after the user confirms their selection:
+Fired on `window` after the user confirms a selection:
 
 ```javascript
 window.addEventListener('file-picker:selected', (event) => {
@@ -239,11 +208,11 @@ window.addEventListener('file-picker:selected', (event) => {
 });
 ```
 
-Each item in `selected` is an object with: `id`, `url`, `filename`, `size`, `extension`, `file_type`, `alt`, `created_at`.
+Each item in `selected` is an object with `id`, `url`, `filename`, `size`, `extension`, `file_type`, `alt`, `created_at`.
 
-### Component events
+### Livewire events
 
-Two component events fire every time the selection changes. Pick the one that fits your handler shape:
+Two events fire whenever the selection changes — pick the one that fits your handler shape:
 
 **`filesSelected`** — named arguments, easiest for typed signatures:
 
@@ -252,64 +221,54 @@ Two component events fire every time the selection changes. Pick the one that fi
 public function onFilesSelected(array $selected, string $inputName): void
 {
     // $selected is an array of media IDs (int)
-    // $inputName is the picker's `input-name` prop (route by it if you have multiple pickers on one page)
+    // $inputName is the picker's `input-name` prop
     $this->selectedIds = $selected;
 }
 ```
 
-**`file-picker-selected`** — single array payload with the full picker context (used by the bundled JS callback support):
+**`file-picker-selected`** — single array payload with the full picker context:
 
 ```php
 #[On('file-picker-selected')]
 public function onFilePickerSelected(array $payload): void
 {
-    // $payload keys: selected, inputName, inputId, formId, multiple, autoSubmit, callbackFunction
+    // keys: selected, inputName, inputId, formId, multiple, autoSubmit, callbackFunction
     $this->selectedIds = $payload['selected'];
 }
 ```
 
-> If you have several pickers on the same page, switch on `$inputName` (or `$payload['inputName']`) to route the selection to the right property.
+> If you have several pickers on one page, switch on `$inputName` to route the selection to the right property.
 
 ## Upload Errors
 
-Upload problems are surfaced to the UI on three levels:
+Upload problems are surfaced to the UI at three levels:
 
-1. **Server-side validation** (size, mime type) — `uploadFiles()` runs the configured `mimes` / `max` rules and any failures are rendered:
-    - as a toast at the top of the upload tab (`uploadStatus = 'error'`), and
-    - as a per-file list (`{original_filename}: {message}`) below the toast.
-2. **Per-file driver failures during processing** — `DuplicateMediaException`, `StorageQuotaExceededException`, `UploadFailedException`, and any other `Throwable` thrown by the driver are caught and aggregated into the same toast (e.g. *"2 uploaded, 1 failed"*).
-3. **Browser-side failures** — the bundled JS listens for `livewire-upload-error` on the picker's file input and forwards the HTTP status to the component via `setUploadError(string $message)`. Common cases are mapped automatically:
+1. **Server-side validation** (size, mime type) — failures render as a toast plus a per-file list (`{filename}: {message}`).
+2. **Per-file driver failures** — `DuplicateMediaException`, `StorageQuotaExceededException`, `UploadFailedException`, or any other `Throwable` thrown by the driver are aggregated into the toast (e.g. *"2 uploaded, 1 failed"*).
+3. **Browser-side failures** — the bundled JS listens for `livewire-upload-error` and forwards the HTTP status:
     - `413` → *"the file is larger than the server allows"*
     - `422` → *"the file did not pass validation"*
     - other status codes → generic *"Upload failed (HTTP …)"*
 
-Error toasts are sticky — they don't auto-clear like success messages do. The user dismisses them with the `×` button (or any new upload action resets the state).
+Error toasts are sticky — dismiss with the `×` button or any new upload action.
 
-If you want to push your own error into the toast from a parent component or hook, call `setUploadError`:
+To push your own error into the toast (e.g. from a custom driver):
 
 ```php
-$this->dispatch('refresh-file-picker'); // example
-// or, from inside your custom driver / extension:
 $this->setUploadError('Quota exceeded — contact your administrator.');
 ```
 
 ## Tablet & Mobile
 
-The library tab uses a side-by-side layout on desktop (≥1025px) with the **Attachment Details** panel always visible. On tablet/mobile (≤1024px), the panel becomes a right-side sheet that's collapsed by default — tapping an item just selects it.
+The library tab uses a side-by-side layout on desktop (≥1025px) with the **Attachment Details** panel always visible. On tablet/mobile (≤1024px), the panel becomes a right-side sheet that's closed by default — tapping a thumbnail just selects it.
 
-To open the details sheet on touch devices, an **edit icon** appears on each grid item (top-left, right after the selection checkbox). Tapping it:
-- promotes the item to the active selection (without toggling existing selections off),
-- dispatches `open-details`, which slides the sheet in.
-
-The icon is hidden on desktop where the sidebar is always inline. You can rename the button via the `texts.view_details` config key (or the published lang file).
+To open the details sheet on touch devices, tap the **edit icon** that sits next to the selection checkbox on each item. It promotes the item to the active selection (without toggling existing selections off) and slides the sheet in. The icon is hidden on desktop where the sidebar is always inline. Rename it via the `texts.view_details` config key (or the published lang file).
 
 ## Drivers
 
 ### Plank driver (default)
 
-The package is built on top of [plank/laravel-mediable](https://github.com/plank/laravel-mediable) — installed automatically as a hard dependency. The bundled `FilePickerMedia` model extends Plank's `Media` model and the install migration adds the extra columns we need (`folder`, `tags`, `is_favorite`, `hash`, `width`, `height`, `duration`, `user_id`, `download_count`, `custom_properties`, `deleted_at`) to Plank's `media` table.
-
-Defaults:
+Built on top of [`plank/laravel-mediable`](https://github.com/plank/laravel-mediable) — installed automatically. The bundled `FilePickerMedia` model extends Plank's `Media` and the install migration adds the extra columns to Plank's existing `media` table.
 
 ```env
 FILE_PICKER_DRIVER=plank
@@ -317,11 +276,11 @@ FILE_PICKER_DISK=public
 FILE_PICKER_DIRECTORY=media
 ```
 
-> **Using a non-public disk?** Plank's `mediable.allowed_disks` config defaults to `['public']` only. To use `s3` or another disk, publish Plank's config (`php artisan vendor:publish --tag=mediable-config`) and add your disk to `allowed_disks`.
+> **Using a non-public disk?** Plank's `mediable.allowed_disks` config defaults to `['public']`. Publish Plank's config (`php artisan vendor:publish --tag=mediable-config`) and add your disk to `allowed_disks`.
 
 ### Custom driver
 
-Implement `Anil\LivewireFilePicker\Contracts\MediaDriverInterface` (or extend `Anil\LivewireFilePicker\Drivers\AbstractDriver`) and register the FQCN as the driver:
+Implement `Anil\LivewireFilePicker\Contracts\MediaDriverInterface` (or extend `Anil\LivewireFilePicker\Drivers\AbstractDriver`) and register the FQCN:
 
 ```php
 // config/file-picker.php
@@ -330,7 +289,7 @@ Implement `Anil\LivewireFilePicker\Contracts\MediaDriverInterface` (or extend `A
 
 ## Authorization
 
-By default all actions are permitted. To add authorization, implement `FilePickerAuthorizationInterface`:
+Default is "everything allowed." For real apps, plug in an authorization class:
 
 ```php
 namespace App\Auth;
@@ -339,29 +298,12 @@ use Anil\LivewireFilePicker\Contracts\FilePickerAuthorizationInterface;
 
 class MediaAuthorization implements FilePickerAuthorizationInterface
 {
-    public function canViewLibrary(): bool
-    {
-        return auth()->check();
-    }
-
-    public function canUpload(): bool
-    {
-        return auth()->user()?->can('upload-media') ?? false;
-    }
-
-    public function canDelete(int $mediaId): bool
-    {
-        return auth()->user()?->can('delete-media') ?? false;
-    }
-
-    public function canEditAlt(int $mediaId): bool
-    {
-        return auth()->check();
-    }
+    public function canViewLibrary(): bool         { return auth()->check(); }
+    public function canUpload(): bool              { return auth()->user()?->can('upload-media') ?? false; }
+    public function canDelete(int $mediaId): bool  { return auth()->user()?->can('delete-media') ?? false; }
+    public function canEditAlt(int $mediaId): bool { return auth()->check(); }
 }
 ```
-
-Register it in the config:
 
 ```php
 // config/file-picker.php
@@ -370,24 +312,19 @@ Register it in the config:
 
 ## Custom Filters
 
-Add custom filter controls to the media library toolbar. Two parts are required:
+Add filter controls to the library toolbar in two parts:
 
-**1. Define the UI controls in config:**
+**1. UI controls in config:**
 
 ```php
-// config/file-picker.php
 'ui' => [
     'custom_filters' => [
         [
             'name'        => 'tag',
             'label'       => 'Tag',
-            'type'        => 'select',        // select | text | checkbox | date_range
+            'type'        => 'select',          // select | text | checkbox | date_range
             'placeholder' => 'All Tags',
-            'options'     => [
-                ''       => 'All Tags',
-                'nature' => 'Nature',
-                'urban'  => 'Urban',
-            ],
+            'options'     => ['' => 'All Tags', 'nature' => 'Nature', 'urban' => 'Urban'],
         ],
         [
             'name'  => 'featured',
@@ -399,7 +336,7 @@ Add custom filter controls to the media library toolbar. Two parts are required:
 ],
 ```
 
-**2. Implement the filter class:**
+**2. The filter class:**
 
 ```php
 namespace App\Filters;
@@ -411,71 +348,50 @@ class MediaFilter implements CustomFilter
 {
     public function apply(Builder $query, array $filters): Builder
     {
-        if (!empty($filters['tag'])) {
-            $query->where('tag', $filters['tag']);
-        }
-
-        if (!empty($filters['featured'])) {
-            $query->where('featured', true);
-        }
+        if (!empty($filters['tag']))      $query->where('tag', $filters['tag']);
+        if (!empty($filters['featured'])) $query->where('featured', true);
 
         return $query;
     }
 }
 ```
 
-## Configuration Reference
+## Configuration
 
-Publish the config to customize everything:
+Publish the config to customise everything:
 
 ```bash
 php artisan vendor:publish --tag=file-picker-config
 ```
 
-### Driver
+Key sections:
 
 ```php
-'driver' => env('FILE_PICKER_DRIVER', 'plank'), // 'plank' | CustomDriver::class
+'driver' => env('FILE_PICKER_DRIVER', 'plank'),  // 'plank' | CustomDriver::class
 
 'drivers' => [
     'plank' => [
-        'model'      => FilePickerMedia::class, // extends Plank\Mediable\Media
+        'model'      => FilePickerMedia::class,
         'disk'       => env('FILE_PICKER_DISK', 'public'),
         'directory'  => env('FILE_PICKER_DIRECTORY', 'media'),
         'visibility' => env('FILE_PICKER_VISIBILITY', 'public'),
     ],
 ],
-```
 
-### Upload limits
-
-```php
 'max_file_size' => env('FILE_PICKER_MAX_SIZE', 102400), // KB (default: 100 MB)
-```
 
-### Defaults
-
-```php
 'defaults' => [
     'multiple'     => false,
     'max_files'    => 40,
     'per_page'     => 24,
     'show_preview' => true,
 ],
-```
 
-### Sorting
-
-```php
 'sorting' => [
     'field'     => 'created_at', // created_at | filename | size | extension
-    'direction' => 'desc',       // asc | desc
+    'direction' => 'desc',
 ],
-```
 
-### Feature toggles
-
-```php
 'features' => [
     'upload'              => true,
     'delete'              => true,
@@ -490,17 +406,13 @@ php artisan vendor:publish --tag=file-picker-config
     'keyboard_navigation' => true,
     'paste_upload'        => true,
 ],
-```
 
-### UI / Theme
-
-```php
 'ui' => [
-    'modal_style'           => 'fullscreen',   // 'fullscreen' | 'centered'
-    'thumbnail_height'      => 150,            // px
-    'show_type_badges'      => true,
-    'show_file_size'        => true,
-    'show_date'             => true,
+    'modal_style'        => 'fullscreen',         // 'fullscreen' | 'centered'
+    'thumbnail_height'   => 150,
+    'show_type_badges'   => true,
+    'show_file_size'     => true,
+    'show_date'          => true,
 
     'colors' => [
         'primary'       => '#0073aa',
@@ -510,32 +422,29 @@ php artisan vendor:publish --tag=file-picker-config
         'warning'       => '#f59e0b',
     ],
 
-    'font_family'           => "'Inter', sans-serif",
-    'border_radius'         => 8,              // px
-    'grid_min_width'        => 160,            // px
-    'grid_gap'              => 14,             // px
-    'sidebar_width'         => 300,            // px
-    'backdrop_blur'         => 12,             // px
-    'backdrop_opacity'      => 0.6,
-    'z_index'               => 9999,
-    'upload_preview_size'   => 120,            // px
-    'upload_area_max_height'=> 400,            // px
+    'font_family'        => "'Inter', sans-serif",
+    'border_radius'      => 8,
+    'grid_min_width'     => 160,
+    'grid_gap'           => 14,
+    'sidebar_width'      => 300,
+    'backdrop_blur'      => 12,
+    'backdrop_opacity'   => 0.6,
+    'z_index'            => 9999,
 
-    'filter_types' => ['image', 'document', 'video', 'audio', 'spreadsheet', 'presentation'],
-
+    'filter_types'        => ['image', 'document', 'video', 'audio', 'spreadsheet', 'presentation'],
     'custom_filters'      => [],
     'custom_filter_class' => '',
 ],
+
+'route_middleware' => ['web'],
 ```
 
 ### Text strings
 
-All text in the UI is configurable and can also be translated via published lang files:
+All UI text is configurable. Publish lang files to translate:
 
 ```bash
 php artisan file-picker:install --lang
-# or
-php artisan vendor:publish --tag=file-picker-lang
 ```
 
 ```php
@@ -548,67 +457,55 @@ php artisan vendor:publish --tag=file-picker-lang
     'no_items'           => 'No media found',
     'insert_button'      => 'Insert Selected',
     'delete_confirm'     => 'Are you sure you want to delete this file?',
-    'view_details'       => 'View details',     // label for the tablet/mobile edit icon
+    'view_details'       => 'View details',     // tablet/mobile edit-icon label
     'sidebar_title'      => 'Attachment Details',
     'close_details'      => 'Close details',
     // ... see config/file-picker.php for the full list
 ],
 ```
 
-### Route middleware
-
-```php
-'route_middleware' => ['web'],
-```
-
-The package registers a route at `/vendor/anil/livewire-file-picker/{file}` to serve CSS/JS assets. This route is protected by the middleware listed here.
-
 ## Customising Views
 
-Publish the blade views to override the UI:
+Publish blade views to override the UI:
 
 ```bash
 php artisan file-picker:install --views
-# or
-php artisan vendor:publish --tag=file-picker-views
 ```
 
-Views will be published to `resources/views/vendor/file-picker/`.
+Views are published to `resources/views/vendor/file-picker/`.
 
 ## API Reference
 
-### FilePicker Component Methods
+### Component methods
 
-| Method                          | Description                                         |
-| ------------------------------- | --------------------------------------------------- |
-| `openModal()` / `closeModal()`  | Open / close the modal                              |
-| `setViewMode('library'\|'trash')` | Switch between active library and trash             |
-| `toggleSelection($id)`          | Toggle selection of a media item                    |
-| `viewDetails($id)`              | Promote item to active and open the details panel (used by the tablet/mobile edit icon) |
-| `clearSelection()`              | Clear all selected items                            |
-| `insertSelected()`              | Confirm selection and close modal                   |
-| `uploadFiles()`                 | Upload pending files                                |
-| `setUploadError($message)`      | Push an error message into the upload toast (also called from the JS upload-error hook) |
-| `deleteMedia($id)`              | Soft-delete a media item (move to trash)            |
-| `restoreMedia($id)`             | Restore from trash                                  |
-| `forceDeleteMedia($id)`         | Permanently delete (and remove file from disk)      |
-| `bulkDelete($ids)`              | Soft-delete many at once                            |
-| `toggleFavorite($id)`           | Toggle favorite                                     |
-| `addTag()` / `removeTag($id, $tag)` | Manage tags on a media item                     |
-| `startMoving($id)` + `saveMove()` | Move a media item to a folder                     |
-| `bulkMoveToFolder($ids, $folder)` | Move many at once                                 |
-| `startReplacing($id)`           | Replace the underlying file (next upload swaps it)  |
-| `refreshMedia()`                | Reload media items                                  |
-| `clearFilters()`                | Reset search/type/folder/tag/favorite filters       |
+| Method                              | Description                                     |
+| ----------------------------------- | ----------------------------------------------- |
+| `openModal()` / `closeModal()`      | Open / close the modal                          |
+| `setViewMode('library'\|'trash')`   | Switch between active library and trash         |
+| `toggleSelection($id)`              | Toggle selection of a media item                |
+| `viewDetails($id)`                  | Promote item to active and open details panel   |
+| `clearSelection()`                  | Clear all selected items                        |
+| `insertSelected()`                  | Confirm selection and close modal               |
+| `uploadFiles()`                     | Upload pending files                            |
+| `setUploadError($message)`          | Push an error message into the upload toast    |
+| `deleteMedia($id)`                  | Soft-delete (move to trash)                     |
+| `restoreMedia($id)`                 | Restore from trash                              |
+| `forceDeleteMedia($id)`             | Permanently delete (and remove file from disk) |
+| `bulkDelete($ids)`                  | Soft-delete many at once                        |
+| `toggleFavorite($id)`               | Toggle favorite                                 |
+| `addTag()` / `removeTag($id, $tag)` | Manage tags                                     |
+| `startMoving($id)` + `saveMove()`   | Move to a folder                                |
+| `bulkMoveToFolder($ids, $folder)`   | Move many at once                               |
+| `startReplacing($id)`               | Replace the underlying file                     |
+| `refreshMedia()`                    | Reload media items                              |
+| `clearFilters()`                    | Reset search / type / folder / tag / favorite   |
 
-### FilePicker Facade
-
-Outside the component, drive the library directly:
+### Facade
 
 ```php
 use Anil\LivewireFilePicker\Facades\FilePicker;
 
-FilePicker::upload($temporaryFile, ['folder' => 'reports', 'tags' => ['q1', 'finance']]);
+FilePicker::upload($temporaryFile, ['folder' => 'reports', 'tags' => ['q1']]);
 FilePicker::replaceFile($id, $newFile);
 FilePicker::toggleFavorite($id);
 FilePicker::addTag($id, 'archive-2024');
@@ -619,7 +516,7 @@ FilePicker::getStats();          // counts, sizes, by_type, favorites_count, tra
 FilePicker::findByHash($sha256); // dedup lookups
 ```
 
-### Console Commands
+### Console commands
 
 ```bash
 php artisan file-picker:prune-trash --days=30 --dry-run
@@ -627,49 +524,22 @@ php artisan file-picker:prune-orphans --dry-run
 php artisan file-picker:stats
 ```
 
-### Download Routes
+### Download routes
 
-| Route                                  | Purpose                              |
-| -------------------------------------- | ------------------------------------ |
-| `GET /file-picker/download/{id}`       | Force-download a single file         |
-| `GET /file-picker/download-zip?ids[]=` | Stream a zip of selected media       |
+| Route                                  | Purpose                        |
+| -------------------------------------- | ------------------------------ |
+| `GET /file-picker/download/{id}`       | Force-download a single file   |
+| `GET /file-picker/download-zip?ids[]=` | Stream a zip of selected media |
 
-### Computed Properties
+### Computed properties
 
-| Property             | Type   | Description                    |
-| -------------------- | ------ | ------------------------------ |
-| `selectedMediaItems` | array  | Full details of selected media |
-| `hasSelection`       | bool   | Whether any items are selected |
-| `selectionLabel`     | string | Human-readable selection count |
-| `selectedCount`      | int    | Number of selected items       |
-
-## Versioning
-
-This package follows [Semantic Versioning](https://semver.org/). While we're in the `0.x` line the public API may change between minor releases — pin to a specific `0.x` range (e.g. `^0.1`) rather than across them.
-
-```bash
-composer require anil/file-picker:^0.1
-```
-
-> **Note on `^0.1`:** Composer expands this to `>=0.1.0, <0.2.0`. When `0.2.0` lands you'll need to bump the constraint deliberately (which is the intended behaviour for pre-1.0 packages).
-
-## Static Analysis
-
-This package uses [PHPStan](https://phpstan.org/) with [Larastan](https://github.com/larastan/larastan) at **level 8**.
-
-```bash
-composer analyse
-```
-
-## Contributing
-
-Contributions are welcome! Please open an issue or pull request.
+| Property             | Type     | Description                    |
+| -------------------- | -------- | ------------------------------ |
+| `selectedMediaItems` | `array`  | Full details of selected media |
+| `hasSelection`       | `bool`   | Whether any items are selected |
+| `selectionLabel`     | `string` | Human-readable selection count |
+| `selectedCount`      | `int`    | Number of selected items       |
 
 ## License
 
-The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
-
-## Credits
-
-- [Er. Anil Kumar Thakur](https://github.com/anilkumarthakur60)
-- [All Contributors](../../contributors)
+The MIT License (MIT). See [License File](LICENSE.md).
